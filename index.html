@@ -1,0 +1,5917 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Yumio restaurant reservation and dine-in ordering." name="description"/>
+<title>Yumio</title>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body class="single-file-prototype">
+<section aria-label="Bill · Yumio" class="prototype-screen" data-source="bill.html" id="bill">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        No active dining session
+       </div>
+<h1>
+        Your Bill
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">
+       No bill is available yet.
+      </div>
+<div class="total-row grand">
+<span>
+        Total
+       </span>
+<span>
+        MVR 0
+       </span>
+</div>
+<div class="actions">
+<a class="btn btn-secondary" href="#orders">
+        Back to Orders
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Cart · Yumio" class="prototype-screen" data-source="cart.html" id="cart">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        No active table
+       </div>
+<h1>
+        Your Cart
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">
+       Your cart is empty.
+      </div>
+<div class="total-row grand">
+<span>
+        Total
+       </span>
+<span>
+        MVR 0
+       </span>
+</div>
+<div class="actions">
+<a class="btn btn-secondary" href="#menu-breakfast">
+        Browse Menu
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Customer History · Yumio" class="prototype-screen" data-source="customer-history.html" id="customer-history">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">Reservations and food ordered during each visit</div>
+<h1>Reservation &amp; Order History</h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="section" id="reservation-order-history-list">
+<h2>Reservation &amp; Order History</h2>
+<div class="empty">No reservation history yet.</div>
+</section></main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn active" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Customer Home · Yumio" class="prototype-screen" data-source="customer-home.html" id="customer-home">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Good evening, Shanku
+       </div>
+<h1>
+        Welcome to Yumio
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="hero">
+<div class="eyebrow">
+       Reserve. Order. Enjoy.
+      </div>
+<h2>
+       Your restaurant experience, in your hands.
+      </h2>
+<p>Reserve before you arrive. Check in after staff confirmation.</p>
+<div class="actions">
+<a class="btn btn-primary" href="#reserve">
+        Reserve a Table
+       </a>
+<a class="btn btn-secondary" href="#menu-breakfast">
+        Browse Menu
+       </a>
+</div>
+</section>
+<div class="scan-banner">
+<div>
+<b>
+        Already at the restaurant?
+       </b>
+<span class="muted">
+        Confirmed reservation? Check in from your account. Walk-in customers can use a table code.
+       </span>
+</div>
+<a class="btn btn-dark" href="#scan-table">
+       Connect Table
+      </a>
+</div>
+<section class="section">
+<div class="section-head">
+<h2>
+        Your Activity
+       </h2>
+<a class="linkbtn" href="#customer-history">
+        View history
+       </a>
+</div>
+<div class="empty">
+       No reservations, orders or payments yet.
+      </div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn active" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Reset password · Yumio" class="prototype-screen" data-source="forgot-password.html" id="forgot-password">
+<div class="shell">
+<header class="topbar">
+<a class="brand" href="#login">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<div class="auth-wrap">
+<main class="auth-card">
+<div class="ticket-meta">
+<span>
+        Yumio · Account Recovery
+       </span>
+<span>
+        RESET
+       </span>
+</div>
+<div class="ticket-head">
+<div>
+<h1>
+         Reset password
+        </h1>
+<p class="muted">
+         We'll get you back in
+        </p>
+</div>
+</div>
+<div class="screen-note">Password recovery is not connected in this version.</div>
+<form action="#reset-sent" class="auth-form">
+<div class="field">
+<label>
+         Email
+        </label>
+<input placeholder="you@example.com" type="email"/>
+</div>
+<button class="btn btn-dark btn-block" type="submit">
+        Send Reset Request
+       </button>
+</form>
+<div class="auth-link-row">
+<a class="linkbtn" href="#login">
+        Back to sign in
+       </a>
+</div>
+</main>
+</div>
+</div>
+</section>
+<section aria-label="Maldivian Breakfast · Yumio" class="prototype-screen" data-source="item-1.html" id="item-1">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Breakfast
+       </div>
+<h1>
+        Maldivian Breakfast
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🥣
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Breakfast
+       </div>
+<h1>
+        Maldivian Breakfast
+       </h1>
+<h3>
+        MVR 85
+       </h3>
+<p>
+        Traditional Maldivian breakfast featuring authentic island flavors. Freshly prepared flatbread is served with aromatic tuna curry, creamy coconut-based dishes, spicy sambal, and tropical accompaniments. Simple, wholesome, and rich in local ingredients, it offers a perfect balance of savory flavors to start the day.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-breakfast">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Chicken 65 · Yumio" class="prototype-screen" data-source="item-10.html" id="item-10">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Startar
+       </div>
+<h1>
+        Chicken 65
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍗
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Startar
+       </div>
+<h1>
+        Chicken 65
+       </h1>
+<h3>
+        MVR 55
+       </h3>
+<p>
+        Crispy fried chicken pieces coated in a spicy red-orange glaze, garnished with curry leaves, dried chilies and fresh lime.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-startar">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Lebanese Chicken · Yumio" class="prototype-screen" data-source="item-11.html" id="item-11">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Main Course
+       </div>
+<h1>
+        Lebanese Chicken
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍗
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Main Course
+       </div>
+<h1>
+        Lebanese Chicken
+       </h1>
+<h3>
+        MVR 85
+       </h3>
+<p>
+        Lebanese chicken is a flavorful dish combining tender chicken with aromatic spices and creamy yoghurt. The chicken is marinated with yoghurt, lemon juice and spices, then grilled or baked until cooked through.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-main-course">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Nasi Goreng · Yumio" class="prototype-screen" data-source="item-12.html" id="item-12">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Main Course
+       </div>
+<h1>
+        Nasi Goreng
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍚
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Main Course
+       </div>
+<h1>
+        Nasi Goreng
+       </h1>
+<h3>
+        MVR 65
+       </h3>
+<p>
+        Nasi goreng is Indonesia's iconic fried rice, characterized by its sweet, savory and smoky flavors, typically made with day-old rice, sweet soy sauce, shrimp paste, and a mix of proteins and vegetables.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-main-course">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Bami Goreng · Yumio" class="prototype-screen" data-source="item-13.html" id="item-13">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Main Course
+       </div>
+<h1>
+        Bami Goreng
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍜
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Main Course
+       </div>
+<h1>
+        Bami Goreng
+       </h1>
+<h3>
+        MVR 75
+       </h3>
+<p>
+        A classic Indonesian stir-fried noodle dish combining savory, sweet and spicy flavors with noodles, vegetables and protein. It is typically made with noodles, vegetables, egg or meat, soy sauce and kecap manis.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-main-course">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Chicken Fried Rice · Yumio" class="prototype-screen" data-source="item-14.html" id="item-14">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Main Course
+       </div>
+<h1>
+        Chicken Fried Rice
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍚
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Main Course
+       </div>
+<h1>
+        Chicken Fried Rice
+       </h1>
+<h3>
+        MVR 55
+       </h3>
+<p>
+        A flavorful stir-fried rice dish made with cooked rice, chicken, eggs, vegetables and seasonings, prepared in a wok for a savory restaurant-style taste.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-main-course">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Tuna Rice · Yumio" class="prototype-screen" data-source="item-15.html" id="item-15">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Main Course
+       </div>
+<h1>
+        Tuna Rice
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍚
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Main Course
+       </div>
+<h1>
+        Tuna Rice
+       </h1>
+<h3>
+        MVR 55
+       </h3>
+<p>
+        A tuna rice bowl with hot rice topped with canned tuna mixed with mayo and black pepper.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-main-course">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Chicken Biryani · Yumio" class="prototype-screen" data-source="item-16.html" id="item-16">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Main Course
+       </div>
+<h1>
+        Chicken Biryani
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍛
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Main Course
+       </div>
+<h1>
+        Chicken Biryani
+       </h1>
+<h3>
+        MVR 65
+       </h3>
+<p>
+        A fragrant, layered rice dish with tender chicken, aromatic spices and rich flavors. Long-grain basmati rice is combined with marinated chicken and spices such as cumin, coriander, cloves, cinnamon and cardamom.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-main-course">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Sizzling Chocolate Brownie · Yumio" class="prototype-screen" data-source="item-17.html" id="item-17">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Desserts
+       </div>
+<h1>
+        Sizzling Chocolate Brownie
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍫
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Desserts
+       </div>
+<h1>
+        Sizzling Chocolate Brownie
+       </h1>
+<h3>
+        MVR 55
+       </h3>
+<p>
+        A fudgy chocolate brownie topped with a scoop of ice cream and drizzled with melted chocolate sauce, served on a hot sizzling plate for a hot-and-cold dessert experience.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-desserts">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Burnt American Cheese Cake · Yumio" class="prototype-screen" data-source="item-18.html" id="item-18">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Desserts
+       </div>
+<h1>
+        Burnt American Cheese Cake
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍰
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Desserts
+       </div>
+<h1>
+        Burnt American Cheese Cake
+       </h1>
+<h3>
+        MVR 50
+       </h3>
+<p>
+        Burnt cheesecake, inspired by both Basque and traditional American cheesecakes, features a caramelized dark top created by baking the cheesecake at a high temperature. The interior remains creamy and smooth, contrasting with the slightly burnt surface and subtle bitterness.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-desserts">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Kunafa · Yumio" class="prototype-screen" data-source="item-19.html" id="item-19">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Desserts
+       </div>
+<h1>
+        Kunafa
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍮
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Desserts
+       </div>
+<h1>
+        Kunafa
+       </h1>
+<h3>
+        MVR 99
+       </h3>
+<p>
+        A kunafa plate is a specially designed cooking and serving pan, usually made from high-quality aluminum, ideal for preparing and presenting Middle Eastern desserts like kunafa or knafeh, ensuring even cooking and elegant serving.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-desserts">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Grilled Spring Chicken · Yumio" class="prototype-screen" data-source="item-2.html" id="item-2">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Breakfast
+       </div>
+<h1>
+        Grilled Spring Chicken
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍗
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Breakfast
+       </div>
+<h1>
+        Grilled Spring Chicken
+       </h1>
+<h3>
+        MVR 25
+       </h3>
+<p>
+        Juicy grilled chicken breast served with creamy mashed potatoes, golden potato wedges, crisp garden lettuce, and a rich mushroom cream sauce for a hearty and satisfying meal.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-breakfast">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Classic Healthy Breakfast · Yumio" class="prototype-screen" data-source="item-3.html" id="item-3">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Breakfast
+       </div>
+<h1>
+        Classic Healthy Breakfast
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍳
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Breakfast
+       </div>
+<h1>
+        Classic Healthy Breakfast
+       </h1>
+<h3>
+        MVR 55
+       </h3>
+<p>
+        A wholesome breakfast featuring a sunny-side-up egg, crispy beef bacon, sliced avocado, cheese, toasted bread, creamy oatmeal topped with fresh fruits, and your choice of coffee or fresh orange juice.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-breakfast">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Mushroom Omelette Breakfast Combo · Yumio" class="prototype-screen" data-source="item-4.html" id="item-4">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Breakfast
+       </div>
+<h1>
+        Mushroom Omelette Breakfast Combo
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍳
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Breakfast
+       </div>
+<h1>
+        Mushroom Omelette Breakfast Combo
+       </h1>
+<h3>
+        MVR 85
+       </h3>
+<p>
+        A light and fluffy mushroom omelette served with toasted bread, fresh guacamole, a green salad, and your choice of orange juice or matcha for a delicious and balanced breakfast.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-breakfast">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Signature Chef's Breakfast · Yumio" class="prototype-screen" data-source="item-5.html" id="item-5">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Breakfast
+       </div>
+<h1>
+        Signature Chef's Breakfast
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🥑
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Breakfast
+       </div>
+<h1>
+        Signature Chef's Breakfast
+       </h1>
+<h3>
+        MVR 85
+       </h3>
+<p>
+        A wholesome breakfast experience featuring farm-fresh eggs, crispy beef bacon, ripe avocado, cheese, toasted bread, creamy fruit oatmeal, and your choice of freshly brewed coffee, orange juice, or premium matcha—crafted to give you the perfect start to your morning.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-breakfast">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Tuna Bites · Yumio" class="prototype-screen" data-source="item-6.html" id="item-6">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Startar
+       </div>
+<h1>
+        Tuna Bites
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🐟
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Startar
+       </div>
+<h1>
+        Tuna Bites
+       </h1>
+<h3>
+        MVR 25
+       </h3>
+<p>
+        Bite-sized tuna snacks that can be prepared in different styles, including Mediterranean herb bites and blackened seared tuna. The tuna is paired with fresh herbs and bold seasonings for a flavorful seafood appetizer.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-startar">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Crispy Fried Shrimps · Yumio" class="prototype-screen" data-source="item-7.html" id="item-7">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Startar
+       </div>
+<h1>
+        Crispy Fried Shrimps
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍤
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Startar
+       </div>
+<h1>
+        Crispy Fried Shrimps
+       </h1>
+<h3>
+        MVR 25
+       </h3>
+<p>
+        Golden-brown crispy fried shrimp served with creamy and spicy dipping sauces, fresh lemon and garnish.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-startar">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Fish &amp; Chips · Yumio" class="prototype-screen" data-source="item-8.html" id="item-8">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Startar
+       </div>
+<h1>
+        Fish &amp; Chips
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🐟
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Startar
+       </div>
+<h1>
+        Fish &amp; Chips
+       </h1>
+<h3>
+        Price TBC
+       </h3>
+<p>
+        Classic battered fish served with thick-cut fries, creamy tartar sauce, fresh dill and a lemon wedge.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<span class="btn btn-secondary btn-block disabled">
+         Price to be confirmed
+        </span>
+<a class="btn btn-secondary btn-block" href="#menu-startar">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Lamb Chops · Yumio" class="prototype-screen" data-source="item-9.html" id="item-9">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Startar
+       </div>
+<h1>
+        Lamb Chops
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🍖
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Startar
+       </div>
+<h1>
+        Lamb Chops
+       </h1>
+<h3>
+        MVR 85
+       </h3>
+<p>
+        Four cooked lamb chops served with rosemary, colorful vegetables and a rich caramelized glaze.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-startar">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Kitchen Dashboard · Yumio" class="prototype-screen" data-source="kitchen-dashboard.html" id="kitchen-dashboard">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as kitchen@yumio.test
+      </div>
+<h1>
+       Kitchen Orders
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+
+<div class="kitchen-board">
+<section class="kitchen-col">
+<h2>
+        New
+       </h2>
+<div class="empty">
+        No new orders.
+       </div>
+</section>
+<section class="kitchen-col">
+<h2>
+        Preparing
+       </h2>
+<div class="empty">
+        No orders preparing.
+       </div>
+</section>
+<section class="kitchen-col">
+<h2>
+        Ready
+       </h2>
+<div class="empty">
+        No orders ready.
+       </div>
+</section>
+</div>
+</main>
+</div>
+</section>
+<section aria-label="Kitchen Order Detail · Yumio" class="prototype-screen" data-source="kitchen-order-detail.html" id="kitchen-order-detail">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as kitchen@yumio.test
+      </div>
+<h1>
+       Order Detail
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<a class="linkbtn" href="#kitchen-dashboard">
+      ← Back to Board
+     </a>
+<section class="section">
+<div class="empty">
+       No kitchen order is selected.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Manager Dashboard · Yumio" class="prototype-screen" data-source="manager-dashboard.html" id="manager-dashboard">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Manager Dashboard
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a class="active" href="#manager-dashboard">
+       Overview
+      </a>
+<a href="#manager-menu">
+       Menu
+      </a>
+<a href="#manager-history-orders">
+       History
+      </a>
+</div>
+<section class="grid-4" style="margin-top:20px">
+<div class="metric">
+<span>
+        Today's reservations
+       </span>
+<b>
+        0
+       </b>
+</div>
+<div class="metric">
+<span>
+        Orders
+       </span>
+<b>
+        0
+       </b>
+</div>
+<div class="metric">
+<span>
+        Payments
+       </span>
+<b>
+        MVR 0
+       </b>
+</div>
+<div class="metric">
+<span>
+        Registered customers
+       </span>
+<b>
+        1
+       </b>
+</div>
+</section>
+<section class="section">
+<div class="section-head">
+<h2>
+        Restaurant Snapshot
+       </h2>
+<a class="linkbtn" href="#manager-history-orders">
+        Full History
+       </a>
+</div>
+<div class="grid-3">
+<div class="metric">
+<span>
+         Tables
+        </span>
+<b>
+         10
+        </b>
+<small>
+         10 available · 0 occupied · 0 reserved
+        </small>
+</div>
+<div class="metric">
+<span>
+         Kitchen
+        </span>
+<b>
+         0
+        </b>
+<small>
+         No active orders
+        </small>
+</div>
+<div class="metric">
+<span>
+         Service
+        </span>
+<b>
+         0
+        </b>
+<small>
+         No pending requests
+        </small>
+</div>
+</div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Manager History - Customers · Yumio" class="prototype-screen" data-source="manager-history-customers.html" id="manager-history-customers">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Full Restaurant History
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#manager-dashboard">
+       Overview
+      </a>
+<a href="#manager-menu">
+       Menu
+      </a>
+<a class="active" href="#manager-history-orders">
+       History
+      </a>
+</div>
+<section class="section">
+<h2>
+       Customers
+      </h2>
+
+<div class="history-tabs">
+<a href="#manager-history-orders">
+        Orders
+       </a>
+<a href="#manager-history-reservations">
+        Reservations
+       </a>
+<a href="#manager-history-payments">
+        Payments
+       </a>
+<a class="active" href="#manager-history-customers">
+        Customers
+       </a>
+<a href="#manager-history-requests">
+        Service Requests
+       </a>
+</div>
+<div class="empty" style="margin-top:18px">No customer activity history.</div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Manager History - Orders · Yumio" class="prototype-screen" data-source="manager-history-orders.html" id="manager-history-orders">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Full Restaurant History
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#manager-dashboard">
+       Overview
+      </a>
+<a href="#manager-menu">
+       Menu
+      </a>
+<a class="active" href="#manager-history-orders">
+       History
+      </a>
+</div>
+<section class="section">
+<h2>
+       Orders
+      </h2>
+
+<div class="history-tabs">
+<a class="active" href="#manager-history-orders">
+        Orders
+       </a>
+<a href="#manager-history-reservations">
+        Reservations
+       </a>
+<a href="#manager-history-payments">
+        Payments
+       </a>
+<a href="#manager-history-customers">
+        Customers
+       </a>
+<a href="#manager-history-requests">
+        Service Requests
+       </a>
+</div>
+<div class="empty" style="margin-top:18px">
+       No order history.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Manager History - Payments · Yumio" class="prototype-screen" data-source="manager-history-payments.html" id="manager-history-payments">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Full Restaurant History
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#manager-dashboard">
+       Overview
+      </a>
+<a href="#manager-menu">
+       Menu
+      </a>
+<a class="active" href="#manager-history-orders">
+       History
+      </a>
+</div>
+<section class="section">
+<h2>
+       Payments
+      </h2>
+
+<div class="history-tabs">
+<a href="#manager-history-orders">
+        Orders
+       </a>
+<a href="#manager-history-reservations">
+        Reservations
+       </a>
+<a class="active" href="#manager-history-payments">
+        Payments
+       </a>
+<a href="#manager-history-customers">
+        Customers
+       </a>
+<a href="#manager-history-requests">
+        Service Requests
+       </a>
+</div>
+<div class="empty" style="margin-top:18px">
+       No payment history.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Manager History - Service Requests · Yumio" class="prototype-screen" data-source="manager-history-requests.html" id="manager-history-requests">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Full Restaurant History
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#manager-dashboard">
+       Overview
+      </a>
+<a href="#manager-menu">
+       Menu
+      </a>
+<a class="active" href="#manager-history-orders">
+       History
+      </a>
+</div>
+<section class="section">
+<h2>
+       Service Requests
+      </h2>
+
+<div class="history-tabs">
+<a href="#manager-history-orders">
+        Orders
+       </a>
+<a href="#manager-history-reservations">
+        Reservations
+       </a>
+<a href="#manager-history-payments">
+        Payments
+       </a>
+<a href="#manager-history-customers">
+        Customers
+       </a>
+<a class="active" href="#manager-history-requests">
+        Service Requests
+       </a>
+</div>
+<div class="empty" style="margin-top:18px">
+       No service-request history.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Manager History - Reservations · Yumio" class="prototype-screen" data-source="manager-history-reservations.html" id="manager-history-reservations">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Full Restaurant History
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#manager-dashboard">
+       Overview
+      </a>
+<a href="#manager-menu">
+       Menu
+      </a>
+<a class="active" href="#manager-history-orders">
+       History
+      </a>
+</div>
+<section class="section">
+<h2>
+       Reservations
+      </h2>
+
+<div class="history-tabs">
+<a href="#manager-history-orders">
+        Orders
+       </a>
+<a class="active" href="#manager-history-reservations">
+        Reservations
+       </a>
+<a href="#manager-history-payments">
+        Payments
+       </a>
+<a href="#manager-history-customers">
+        Customers
+       </a>
+<a href="#manager-history-requests">
+        Service Requests
+       </a>
+</div>
+<div class="empty" style="margin-top:18px">
+       No reservation history.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Menu Management · Yumio" class="prototype-screen" data-source="manager-menu.html" id="manager-menu">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      Manager / Admin
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<div class="admin-head">
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Menu Management
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a class="" href="#manager-dashboard">
+       Overview
+      </a>
+<a class="active" href="#manager-menu">
+       Menu
+      </a>
+<a class="" href="#manager-history-orders">
+       History
+      </a>
+</div>
+<div class="section-head">
+<div>
+<h2>
+        Menu Items
+       </h2>
+<p class="muted">
+        Add, edit, hide or remove menu items.
+       </p>
+</div>
+<a class="btn btn-primary" href="#manager-menu-add">
+       + Add Item
+      </a>
+</div>
+<div class="menu-admin-grid">
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🥣
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Maldivian Breakfast
+          </strong>
+<div class="meta">
+           Breakfast · MVR 85
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Traditional Maldivian breakfast featuring authentic island flavors. Freshly prepared flatbread is served with aromatic tuna curry, creamy coconut-base
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍗
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Grilled Spring Chicken
+          </strong>
+<div class="meta">
+           Breakfast · MVR 25
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Juicy grilled chicken breast served with creamy mashed potatoes, golden potato wedges, crisp garden lettuce, and a rich mushroom cream sauce for a hea
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍳
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Classic Healthy Breakfast
+          </strong>
+<div class="meta">
+           Breakfast · MVR 55
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A wholesome breakfast featuring a sunny-side-up egg, crispy beef bacon, sliced avocado, cheese, toasted bread, creamy oatmeal topped with fresh fruits
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍳
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Mushroom Omelette Breakfast Combo
+          </strong>
+<div class="meta">
+           Breakfast · MVR 85
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A light and fluffy mushroom omelette served with toasted bread, fresh guacamole, a green salad, and your choice of orange juice or matcha for a delici
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🥑
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Signature Chef's Breakfast
+          </strong>
+<div class="meta">
+           Breakfast · MVR 85
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A wholesome breakfast experience featuring farm-fresh eggs, crispy beef bacon, ripe avocado, cheese, toasted bread, creamy fruit oatmeal, and your cho
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🐟
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Tuna Bites
+          </strong>
+<div class="meta">
+           Startar · MVR 25
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Bite-sized tuna snacks that can be prepared in different styles, including Mediterranean herb bites and blackened seared tuna. The tuna is paired with
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍤
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Crispy Fried Shrimps
+          </strong>
+<div class="meta">
+           Startar · MVR 25
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Golden-brown crispy fried shrimp served with creamy and spicy dipping sauces, fresh lemon and garnish.
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🐟
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Fish &amp; Chips
+          </strong>
+<div class="meta">
+           Startar · Price TBC
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Classic battered fish served with thick-cut fries, creamy tartar sauce, fresh dill and a lemon wedge.
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍖
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Lamb Chops
+          </strong>
+<div class="meta">
+           Startar · MVR 85
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Four cooked lamb chops served with rosemary, colorful vegetables and a rich caramelized glaze.
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍗
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Chicken 65
+          </strong>
+<div class="meta">
+           Startar · MVR 55
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Crispy fried chicken pieces coated in a spicy red-orange glaze, garnished with curry leaves, dried chilies and fresh lime.
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍗
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Lebanese Chicken
+          </strong>
+<div class="meta">
+           Main Course · MVR 85
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Lebanese chicken is a flavorful dish combining tender chicken with aromatic spices and creamy yoghurt. The chicken is marinated with yoghurt, lemon ju
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍚
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Nasi Goreng
+          </strong>
+<div class="meta">
+           Main Course · MVR 65
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Nasi goreng is Indonesia's iconic fried rice, characterized by its sweet, savory and smoky flavors, typically made with day-old rice, sweet soy sauce,
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍜
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Bami Goreng
+          </strong>
+<div class="meta">
+           Main Course · MVR 75
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A classic Indonesian stir-fried noodle dish combining savory, sweet and spicy flavors with noodles, vegetables and protein. It is typically made with
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍚
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Chicken Fried Rice
+          </strong>
+<div class="meta">
+           Main Course · MVR 55
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A flavorful stir-fried rice dish made with cooked rice, chicken, eggs, vegetables and seasonings, prepared in a wok for a savory restaurant-style tast
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍚
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Tuna Rice
+          </strong>
+<div class="meta">
+           Main Course · MVR 55
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A tuna rice bowl with hot rice topped with canned tuna mixed with mayo and black pepper.
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍛
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Chicken Biryani
+          </strong>
+<div class="meta">
+           Main Course · MVR 65
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A fragrant, layered rice dish with tender chicken, aromatic spices and rich flavors. Long-grain basmati rice is combined with marinated chicken and sp
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍫
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Sizzling Chocolate Brownie
+          </strong>
+<div class="meta">
+           Desserts · MVR 55
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A fudgy chocolate brownie topped with a scoop of ice cream and drizzled with melted chocolate sauce, served on a hot sizzling plate for a hot-and-cold
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍰
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Burnt American Cheese Cake
+          </strong>
+<div class="meta">
+           Desserts · MVR 50
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         Burnt cheesecake, inspired by both Basque and traditional American cheesecakes, features a caramelized dark top created by baking the cheesecake at a
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+<div class="menu-admin-card">
+<div class="menu-admin-icon">
+        🍮
+       </div>
+<div>
+<div class="section-head">
+<div>
+<strong>
+           Kunafa
+          </strong>
+<div class="meta">
+           Desserts · MVR 99
+          </div>
+</div>
+<span class="status">
+          Available
+         </span>
+</div>
+<p class="muted">
+         A kunafa plate is a specially designed cooking and serving pan, usually made from high-quality aluminum, ideal for preparing and presenting Middle Eas
+        </p>
+<div class="actions">
+<a class="btn btn-outline" href="#manager-menu-edit">
+          Edit
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Hide
+         </a>
+<a class="btn btn-secondary" href="#manager-menu">
+          Remove
+         </a>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</section>
+<section aria-label="Add Menu Item · Yumio" class="prototype-screen" data-source="manager-menu-add.html" id="manager-menu-add">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      Manager / Admin
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<div class="admin-head">
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Add Menu Item
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<section class="card">
+<form action="#manager-menu" class="form-grid" id="manager-add-menu-form">
+<div class="field">
+<label>
+         Item name
+        </label>
+<input id="add-item-name" name="add-item-name" placeholder="New menu item"/>
+</div>
+<div class="field">
+<label>
+         Price (MVR)
+        </label>
+<input id="add-item-price" name="add-item-price" placeholder="85" type="number"/>
+</div>
+<div class="field">
+<label>
+         Category
+        </label>
+<select id="add-item-category" name="add-item-category">
+<option>
+          Breakfast
+         </option>
+<option>
+          Startar
+         </option>
+<option>
+          Main Course
+         </option>
+<option>
+          Desserts
+         </option>
+</select>
+</div>
+<div class="field">
+<label>
+         Icon / emoji
+        </label>
+<input id="add-item-icon" name="add-item-icon" value="🍽️"/>
+</div>
+<div class="field full">
+<label>
+         Description
+        </label>
+<textarea id="add-item-description" name="add-item-description" rows="4"></textarea>
+</div>
+<div class="field full">
+<label>
+         Options
+        </label>
+<input id="add-extra-1" name="add-extra-1" placeholder="Mild, Medium, Spicy"/>
+</div>
+<div class="field full">
+<label>
+         Extras / changes
+        </label>
+<input id="add-extra-2" name="add-extra-2" placeholder="Extra cheese, No onion"/>
+</div>
+<div class="field full">
+<button class="btn btn-primary btn-block" type="submit">
+         Add Menu Item
+        </button>
+</div>
+</form>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Edit Menu Item · Yumio" class="prototype-screen" data-source="manager-menu-edit.html" id="manager-menu-edit">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      Manager / Admin
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<div class="admin-head">
+<div>
+<div class="greeting light">
+       Signed in as admin@yumio.test
+      </div>
+<h1>
+       Edit Menu Item
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<section class="card">
+<form action="#manager-menu" class="form-grid" id="manager-edit-menu-form">
+<div class="field">
+<label>
+         Item name
+        </label>
+<input id="edit-item-name" name="edit-item-name" value=""/>
+</div>
+<div class="field">
+<label>
+         Price (MVR)
+        </label>
+<input id="edit-item-price" name="edit-item-price" type="number" value=""/>
+</div>
+<div class="field">
+<label>
+         Category
+        </label>
+<select id="edit-item-category" name="edit-item-category">
+<option>
+          Breakfast
+         </option>
+<option>
+          Startar
+         </option>
+<option>
+          Main Course
+         </option>
+<option>
+          Desserts
+         </option>
+</select>
+</div>
+<div class="field">
+<label>
+         Icon / emoji
+        </label>
+<input id="edit-item-icon" name="edit-item-icon" value=""/>
+</div>
+<div class="field full">
+<label>
+         Description
+        </label>
+<textarea id="edit-item-description" name="edit-item-description" rows="4"></textarea>
+</div>
+<div class="field full">
+<button class="btn btn-dark btn-block" type="submit">
+         Save Changes
+        </button>
+</div>
+</form>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Breakfast Menu · Yumio" class="prototype-screen" data-source="menu-breakfast.html" id="menu-breakfast">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">Breakfast · No table</div>
+<h1>
+        Digital Menu
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<div class="scan-banner compact">
+<div>
+<b>No table connected</b>
+<span class="muted">Connect to a table after you arrive if you want to place a dine-in order.</span>
+</div>
+<a class="btn btn-secondary" href="#scan-table">
+       Change Table
+      </a>
+</div>
+<section class="section">
+<div class="field">
+<label>
+        Search dishes
+       </label>
+<input placeholder="Search dishes"/>
+</div>
+<div style="margin-top:14px">
+<div class="menu-row">
+<a class="menu-chip active" href="#menu-breakfast">
+         Breakfast
+        </a>
+<a class="menu-chip" href="#menu-startar">
+         Startar
+        </a>
+<a class="menu-chip" href="#menu-main-course">
+         Main Course
+        </a>
+<a class="menu-chip" href="#menu-desserts">
+         Desserts
+        </a>
+</div>
+</div>
+<div class="food-grid">
+<article class="food">
+<div class="food-visual">
+         🥣
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Maldivian Breakfast
+         </div>
+<div class="food-desc">
+          Traditional Maldivian breakfast featuring authentic island flavors. Freshly prepared flatbread is served with aromatic tuna curry, creamy coconut-based dishes, spicy sambal, and tropical accompaniments. Simple, wholesome, and rich in local ingredients, it offers a perfect balance of savory flavors to start the day.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 85
+          </span>
+<a aria-label="Open Maldivian Breakfast" class="circle-btn" href="#item-1">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍗
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Grilled Spring Chicken
+         </div>
+<div class="food-desc">
+          Juicy grilled chicken breast served with creamy mashed potatoes, golden potato wedges, crisp garden lettuce, and a rich mushroom cream sauce for a hearty and satisfying meal.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 25
+          </span>
+<a aria-label="Open Grilled Spring Chicken" class="circle-btn" href="#item-2">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍳
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Classic Healthy Breakfast
+         </div>
+<div class="food-desc">
+          A wholesome breakfast featuring a sunny-side-up egg, crispy beef bacon, sliced avocado, cheese, toasted bread, creamy oatmeal topped with fresh fruits, and your choice of coffee or fresh orange juice.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 55
+          </span>
+<a aria-label="Open Classic Healthy Breakfast" class="circle-btn" href="#item-3">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍳
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Mushroom Omelette Breakfast Combo
+         </div>
+<div class="food-desc">
+          A light and fluffy mushroom omelette served with toasted bread, fresh guacamole, a green salad, and your choice of orange juice or matcha for a delicious and balanced breakfast.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 85
+          </span>
+<a aria-label="Open Mushroom Omelette Breakfast Combo" class="circle-btn" href="#item-4">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🥑
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Signature Chef's Breakfast
+         </div>
+<div class="food-desc">
+          A wholesome breakfast experience featuring farm-fresh eggs, crispy beef bacon, ripe avocado, cheese, toasted bread, creamy fruit oatmeal, and your choice of freshly brewed coffee, orange juice, or premium matcha—crafted to give you the perfect start to your morning.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 85
+          </span>
+<a aria-label="Open Signature Chef's Breakfast" class="circle-btn" href="#item-5">
+           +
+          </a>
+</div>
+</div>
+</article>
+</div>
+</section>
+<a class="btn btn-primary btn-block" href="#cart">
+      View Cart · 0 items · MVR 0
+     </a>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Desserts Menu · Yumio" class="prototype-screen" data-source="menu-desserts.html" id="menu-desserts">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">Desserts · No table</div>
+<h1>
+        Digital Menu
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<div class="scan-banner compact">
+<div>
+<b>No table connected</b>
+<span class="muted">Connect to a table after you arrive if you want to place a dine-in order.</span>
+</div>
+<a class="btn btn-secondary" href="#scan-table">
+       Change Table
+      </a>
+</div>
+<section class="section">
+<div class="field">
+<label>
+        Search dishes
+       </label>
+<input placeholder="Search dishes"/>
+</div>
+<div style="margin-top:14px">
+<div class="menu-row">
+<a class="menu-chip" href="#menu-breakfast">
+         Breakfast
+        </a>
+<a class="menu-chip" href="#menu-startar">
+         Startar
+        </a>
+<a class="menu-chip" href="#menu-main-course">
+         Main Course
+        </a>
+<a class="menu-chip active" href="#menu-desserts">
+         Desserts
+        </a>
+</div>
+</div>
+<div class="food-grid">
+<article class="food">
+<div class="food-visual">
+         🍫
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Sizzling Chocolate Brownie
+         </div>
+<div class="food-desc">
+          A fudgy chocolate brownie topped with a scoop of ice cream and drizzled with melted chocolate sauce, served on a hot sizzling plate for a hot-and-cold dessert experience.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 55
+          </span>
+<a aria-label="Open Sizzling Chocolate Brownie" class="circle-btn" href="#item-17">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍰
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Burnt American Cheese Cake
+         </div>
+<div class="food-desc">
+          Burnt cheesecake, inspired by both Basque and traditional American cheesecakes, features a caramelized dark top created by baking the cheesecake at a high temperature. The interior remains creamy and smooth, contrasting with the slightly burnt surface and subtle bitterness.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 50
+          </span>
+<a aria-label="Open Burnt American Cheese Cake" class="circle-btn" href="#item-18">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍮
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Kunafa
+         </div>
+<div class="food-desc">
+          A kunafa plate is a specially designed cooking and serving pan, usually made from high-quality aluminum, ideal for preparing and presenting Middle Eastern desserts like kunafa or knafeh, ensuring even cooking and elegant serving.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 99
+          </span>
+<a aria-label="Open Kunafa" class="circle-btn" href="#item-19">
+           +
+          </a>
+</div>
+</div>
+</article>
+</div>
+</section>
+<a class="btn btn-primary btn-block" href="#cart">
+      View Cart · 0 items · MVR 0
+     </a>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Main Course Menu · Yumio" class="prototype-screen" data-source="menu-main-course.html" id="menu-main-course">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">Main Course · No table</div>
+<h1>
+        Digital Menu
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<div class="scan-banner compact">
+<div>
+<b>No table connected</b>
+<span class="muted">Connect to a table after you arrive if you want to place a dine-in order.</span>
+</div>
+<a class="btn btn-secondary" href="#scan-table">
+       Change Table
+      </a>
+</div>
+<section class="section">
+<div class="field">
+<label>
+        Search dishes
+       </label>
+<input placeholder="Search dishes"/>
+</div>
+<div style="margin-top:14px">
+<div class="menu-row">
+<a class="menu-chip" href="#menu-breakfast">
+         Breakfast
+        </a>
+<a class="menu-chip" href="#menu-startar">
+         Startar
+        </a>
+<a class="menu-chip active" href="#menu-main-course">
+         Main Course
+        </a>
+<a class="menu-chip" href="#menu-desserts">
+         Desserts
+        </a>
+</div>
+</div>
+<div class="food-grid">
+<article class="food">
+<div class="food-visual">
+         🍗
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Lebanese Chicken
+         </div>
+<div class="food-desc">
+          Lebanese chicken is a flavorful dish combining tender chicken with aromatic spices and creamy yoghurt. The chicken is marinated with yoghurt, lemon juice and spices, then grilled or baked until cooked through.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 85
+          </span>
+<a aria-label="Open Lebanese Chicken" class="circle-btn" href="#item-11">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍚
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Nasi Goreng
+         </div>
+<div class="food-desc">
+          Nasi goreng is Indonesia's iconic fried rice, characterized by its sweet, savory and smoky flavors, typically made with day-old rice, sweet soy sauce, shrimp paste, and a mix of proteins and vegetables.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 65
+          </span>
+<a aria-label="Open Nasi Goreng" class="circle-btn" href="#item-12">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍜
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Bami Goreng
+         </div>
+<div class="food-desc">
+          A classic Indonesian stir-fried noodle dish combining savory, sweet and spicy flavors with noodles, vegetables and protein. It is typically made with noodles, vegetables, egg or meat, soy sauce and kecap manis.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 75
+          </span>
+<a aria-label="Open Bami Goreng" class="circle-btn" href="#item-13">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍚
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Chicken Fried Rice
+         </div>
+<div class="food-desc">
+          A flavorful stir-fried rice dish made with cooked rice, chicken, eggs, vegetables and seasonings, prepared in a wok for a savory restaurant-style taste.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 55
+          </span>
+<a aria-label="Open Chicken Fried Rice" class="circle-btn" href="#item-14">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍚
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Tuna Rice
+         </div>
+<div class="food-desc">
+          A tuna rice bowl with hot rice topped with canned tuna mixed with mayo and black pepper.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 55
+          </span>
+<a aria-label="Open Tuna Rice" class="circle-btn" href="#item-15">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍛
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Chicken Biryani
+         </div>
+<div class="food-desc">
+          A fragrant, layered rice dish with tender chicken, aromatic spices and rich flavors. Long-grain basmati rice is combined with marinated chicken and spices such as cumin, coriander, cloves, cinnamon and cardamom.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 65
+          </span>
+<a aria-label="Open Chicken Biryani" class="circle-btn" href="#item-16">
+           +
+          </a>
+</div>
+</div>
+</article>
+</div>
+</section>
+<a class="btn btn-primary btn-block" href="#cart">
+      View Cart · 0 items · MVR 0
+     </a>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Startar Menu · Yumio" class="prototype-screen" data-source="menu-startar.html" id="menu-startar">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">Startar · No table</div>
+<h1>
+        Digital Menu
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<div class="scan-banner compact">
+<div>
+<b>No table connected</b>
+<span class="muted">Connect to a table after you arrive if you want to place a dine-in order.</span>
+</div>
+<a class="btn btn-secondary" href="#scan-table">
+       Change Table
+      </a>
+</div>
+<section class="section">
+<div class="field">
+<label>
+        Search dishes
+       </label>
+<input placeholder="Search dishes"/>
+</div>
+<div style="margin-top:14px">
+<div class="menu-row">
+<a class="menu-chip" href="#menu-breakfast">
+         Breakfast
+        </a>
+<a class="menu-chip active" href="#menu-startar">
+         Startar
+        </a>
+<a class="menu-chip" href="#menu-main-course">
+         Main Course
+        </a>
+<a class="menu-chip" href="#menu-desserts">
+         Desserts
+        </a>
+</div>
+</div>
+<div class="food-grid">
+<article class="food">
+<div class="food-visual">
+         🐟
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Tuna Bites
+         </div>
+<div class="food-desc">
+          Bite-sized tuna snacks that can be prepared in different styles, including Mediterranean herb bites and blackened seared tuna. The tuna is paired with fresh herbs and bold seasonings for a flavorful seafood appetizer.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 25
+          </span>
+<a aria-label="Open Tuna Bites" class="circle-btn" href="#item-6">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍤
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Crispy Fried Shrimps
+         </div>
+<div class="food-desc">
+          Golden-brown crispy fried shrimp served with creamy and spicy dipping sauces, fresh lemon and garnish.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 25
+          </span>
+<a aria-label="Open Crispy Fried Shrimps" class="circle-btn" href="#item-7">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🐟
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Fish &amp; Chips
+         </div>
+<div class="food-desc">
+          Classic battered fish served with thick-cut fries, creamy tartar sauce, fresh dill and a lemon wedge.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           Price TBC
+          </span>
+<span class="circle-btn" style="opacity:.45">
+           –
+          </span>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍖
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Lamb Chops
+         </div>
+<div class="food-desc">
+          Four cooked lamb chops served with rosemary, colorful vegetables and a rich caramelized glaze.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 85
+          </span>
+<a aria-label="Open Lamb Chops" class="circle-btn" href="#item-9">
+           +
+          </a>
+</div>
+</div>
+</article>
+<article class="food">
+<div class="food-visual">
+         🍗
+        </div>
+<div class="food-body">
+<div class="food-title">
+          Chicken 65
+         </div>
+<div class="food-desc">
+          Crispy fried chicken pieces coated in a spicy red-orange glaze, garnished with curry leaves, dried chilies and fresh lime.
+         </div>
+<div class="food-bottom">
+<span class="price">
+           MVR 55
+          </span>
+<a aria-label="Open Chicken 65" class="circle-btn" href="#item-10">
+           +
+          </a>
+</div>
+</div>
+</article>
+</div>
+</section>
+<a class="btn btn-primary btn-block" href="#cart">
+      View Cart · 0 items · MVR 0
+     </a>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Order Placed · Yumio" class="prototype-screen" data-source="order-confirmation.html" id="order-confirmation">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Order status
+       </div>
+<h1>
+        Order Confirmation
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">
+       No order has been submitted yet.
+      </div>
+<div class="actions">
+<a class="btn btn-primary" href="#menu-breakfast">
+        Browse Menu
+       </a>
+<a class="btn btn-secondary" href="#customer-home">
+        Back Home
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Order Tracking · Yumio" class="prototype-screen" data-source="order-tracking.html" id="order-tracking">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        No active order
+       </div>
+<h1>
+        Order Tracking
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="section">
+<div class="empty">
+       There is no active order to track.
+      </div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Orders · Yumio" class="prototype-screen" data-source="orders.html" id="orders">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        No active table
+       </div>
+<h1>
+        Your Orders
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="section">
+<div class="empty">
+       No orders have been placed yet.
+       <div class="actions" style="justify-content:center">
+<a class="btn btn-primary" href="#menu-breakfast">
+         Browse Menu
+        </a>
+</div>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Payment · Yumio" class="prototype-screen" data-source="payment.html" id="payment">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        No amount due
+       </div>
+<h1>
+        Payment
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">
+       There is no bill ready for payment.
+      </div>
+<div class="total-row grand">
+<span>
+        Amount due
+       </span>
+<span>
+        MVR 0
+       </span>
+</div>
+<div class="actions">
+<a class="btn btn-secondary" href="#bill">
+        Back to Bill
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Payment Complete · Yumio" class="prototype-screen" data-source="payment-success.html" id="payment-success">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Payment status
+       </div>
+<h1>
+        Payment
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">No payment completed yet.</div>
+<div class="actions">
+<a class="btn btn-dark" href="#customer-home">
+        Back Home
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="My Reservation · Yumio" class="prototype-screen" data-source="my-reservations.html" id="my-reservations">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark"></span>
+            Yumio
+          </a>
+<span class="signed-area">shanku@yumio.test</span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">Reservation status and available actions</div>
+<h1>My Reservation</h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="section" id="my-reservations-list">
+<div class="section-head">
+<h2>Your Reservations</h2>
+<a class="btn btn-primary" href="#reserve">New Reservation</a>
+</div>
+<div class="empty">No reservations yet.</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn active" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section><section aria-label="Profile · Yumio" class="prototype-screen" data-source="profile.html" id="profile">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Your Yumio account
+       </div>
+<h1>
+        Profile
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card profile-card">
+<div class="avatar">
+       S
+      </div>
+<div>
+<h2>
+        Shanku
+       </h2>
+<div class="meta">
+        Customer account
+       </div>
+<p>
+        shanku@yumio.test
+       </p>
+</div>
+</section>
+<section class="section">
+<h2>
+       Account
+      </h2>
+<div class="list">
+<a class="list-item" href="#customer-history">
+<div>
+<strong>
+          Reservation &amp; Order History
+         </strong>
+<div class="meta">
+          No activity yet
+         </div>
+</div>
+<span>
+         ›
+        </span>
+</a>
+<a class="list-item" href="#login">
+<div>
+<strong>
+          Sign Out
+         </strong>
+
+</div>
+<span>
+         ›
+        </span>
+</a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn active" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Create account · Yumio" class="prototype-screen" data-source="register.html" id="register">
+<div class="shell">
+<header class="topbar">
+<a class="brand" href="#login">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<div class="auth-wrap">
+<main class="auth-card">
+<div class="ticket-meta">
+<span>
+        Yumio · Accounts
+       </span>
+<span>ACCOUNT</span>
+</div>
+<div class="ticket-head">
+<div>
+<h1>
+         Registration
+        </h1>
+<p class="muted">Account creation is currently unavailable.</p>
+</div>
+</div>
+
+<div class="actions">
+<a class="btn btn-dark btn-block" href="#login">
+        Back to Sign In
+       </a>
+</div>
+</main>
+</div>
+</div>
+</section>
+<section aria-label="Reservation Confirmed · Yumio" class="prototype-screen" data-source="reservation-confirmation.html" id="reservation-confirmation">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Reservation status
+       </div>
+<h1>
+        Reservation
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">No reservation selected.</div>
+<div class="actions">
+<a class="btn btn-dark" href="#customer-home">
+        Back Home
+       </a>
+<a class="btn btn-secondary" href="#reserve">
+        Make a Reservation
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn active" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Reservation Details · Yumio" class="prototype-screen" data-source="reservation-details.html" id="reservation-details">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Review before confirming
+       </div>
+<h1>
+        Reservation Details
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">No reservation selected.</div>
+<div class="actions">
+<a class="btn btn-secondary" href="#reserve">
+        Back to Reservation
+       </a>
+<a class="btn btn-dark" href="#reservation-confirmation">Confirm Reservation</a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn active" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Reserve a Table · Yumio" class="prototype-screen" data-source="reserve.html" id="reserve">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Table reservation
+       </div>
+<h1>
+        Reserve a Table
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="form-grid">
+<div class="field">
+<label>
+         Date
+        </label>
+<input id="reservation-date" name="reservation-date" type="date"/>
+</div>
+<div class="field">
+<label>
+         Guests
+        </label>
+<input id="reservation-guests" inputmode="numeric" max="20" min="1" name="reservation-guests" placeholder="Enter number of guests" required="" step="1" type="number"/>
+</div>
+<div class="field full">
+<label for="reservation-hour">Preferred time</label>
+<div class="time-picker-row">
+<div class="time-picker-part">
+<label class="sub-label" for="reservation-hour">Hour</label>
+<input id="reservation-hour" inputmode="numeric" max="12" min="1" name="reservation-hour" placeholder="1–12" required="" step="1" type="number"/>
+</div>
+<div class="time-picker-part">
+<label class="sub-label" for="reservation-minute">Minute</label>
+<select id="reservation-minute" name="reservation-minute" required="">
+<option value="">Minute</option>
+<option value="00">00</option>
+<option value="15">15</option>
+<option value="30">30</option>
+<option value="45">45</option>
+</select>
+</div>
+<div class="time-picker-part">
+<label class="sub-label" for="reservation-period">AM / PM</label>
+<select id="reservation-period" name="reservation-period" required="">
+<option value="">AM / PM</option>
+<option value="AM">AM</option>
+<option value="PM">PM</option>
+</select>
+</div>
+</div>
+</div>
+<div class="field full reservation-table-field">
+<label for="reservation-table">Choose a table</label>
+<select disabled="" id="reservation-table" name="reservation-table">
+<option selected="" value="">Choose date, guests and time first</option>
+</select>
+<div class="meta reservation-table-help">Available tables will appear after you choose the date, number of guests and preferred time.</div>
+</div><div class="field full">
+<label>
+         Special request (optional)
+        </label>
+<textarea id="reservation-request" name="reservation-request" placeholder="Add a note" rows="3"></textarea>
+</div>
+</div>
+<div class="notice reservation-qr-note">
+<b>No QR code is needed to reserve.</b>
+<span>Use the table code only after you arrive.</span>
+</div><div class="actions">
+<a class="btn btn-primary" href="#reservation-details" id="review-reservation">
+        Review Reservation
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn active" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Reset request sent · Yumio" class="prototype-screen" data-source="reset-sent.html" id="reset-sent">
+<div class="shell">
+<header class="topbar">
+<a class="brand" href="#login">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<div class="auth-wrap">
+<main class="auth-card">
+<div class="ticket-head">
+<div>
+<h1>
+         Request received
+        </h1>
+<p class="muted">Password recovery</p>
+</div>
+</div>
+<div class="notice table-connected">
+<b>Reset request recorded</b>
+<span>Password recovery is not connected in this version.</span>
+</div>
+<div class="actions">
+<a class="btn btn-dark btn-block" href="#login">
+        Back to Sign In
+       </a>
+</div>
+</main>
+</div>
+</div>
+</section>
+<section aria-label="Scan Table QR · Yumio" class="prototype-screen" data-source="scan-table.html" id="scan-table">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        No active table
+       </div>
+<h1>
+        Connect to Your Table
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<div class="item-layout">
+<section class="card">
+<div class="qr-camera">
+<div class="qr-grid">
+</div>
+<div class="qr-frame">
+</div>
+<strong>
+         Camera preview area
+        </strong>
+</div>
+<p class="muted" style="margin-top:12px">Use this after arrival for table connection. Reservations do not require a QR code.</p>
+</section>
+<section class="card">
+<h2>
+        Enter the table code
+       </h2>
+<div class="notice reserve-without-qr">
+<b>Booking before you arrive?</b>
+<span>Reserve your table without a QR code.</span>
+</div>
+<div class="actions reserve-without-qr-actions">
+<a class="btn btn-primary" href="#reserve">Reserve a Table</a>
+</div>
+<form action="#table-connected" id="connect-table-form">
+<div class="field">
+<label>
+          Table QR code
+         </label>
+<input id="table-code" name="table-code" placeholder="Example: YUMIO-01" value=""/>
+</div>
+<button class="btn btn-dark btn-block" style="margin-top:14px" type="submit">
+         Connect
+        </button>
+</form>
+<div class="actions">
+<a class="btn btn-secondary" href="#customer-home">
+         Cancel
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn active" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+
+<section aria-label="Request Sent · Yumio" class="prototype-screen" data-source="service-request-sent.html" id="service-request-sent">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Service request
+       </div>
+<h1>
+        Request
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">No request sent yet.</div>
+<div class="actions">
+<a class="btn btn-secondary" href="#service-requests">
+        Back
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Service Requests · Yumio" class="prototype-screen" data-source="service-requests.html" id="service-requests">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Send a request to staff
+       </div>
+<h1>
+        Need Something?
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="section">
+<div class="empty">
+       Connect to a table before sending a service request.
+      </div>
+<div class="grid-2" style="margin-top:16px">
+<a class="card" href="#service-request-sent">
+<h3>
+         💧 Water
+        </h3>
+<p class="meta">
+         Ask staff to bring water.
+        </p>
+</a>
+<a class="card" href="#service-request-sent">
+<h3>
+         🍴 Cutlery
+        </h3>
+<p class="meta">
+         Request extra cutlery.
+        </p>
+</a>
+<a class="card" href="#service-request-sent">
+<h3>
+         🙋 Call Staff
+        </h3>
+<p class="meta">
+         Ask a staff member to visit your table.
+        </p>
+</a>
+<a class="card" href="#service-request-sent">
+<h3>
+         ✎ Other
+        </h3>
+<p class="meta">
+         Send another service request.
+        </p>
+</a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Reservation Check-In · Yumio" class="prototype-screen" data-source="staff-check-in.html" id="staff-check-in">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as staff@yumio.test
+      </div>
+<h1>
+       Reservation Check-In
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<a class="linkbtn" href="#staff-reservations">
+      ← Back to Reservations
+     </a>
+<section class="section">
+<div class="empty">
+       No reservation is selected for check-in.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Staff Dashboard · Yumio" class="prototype-screen" data-source="staff-dashboard.html" id="staff-dashboard">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as staff@yumio.test
+      </div>
+<h1>
+       Staff Dashboard
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a class="active" href="#staff-dashboard">
+       Overview
+      </a>
+<a href="#staff-reservations">
+       Reservations
+      </a>
+<a href="#staff-tables">
+       Tables
+      </a>
+<a href="#staff-requests">
+       Requests
+      </a>
+</div>
+<section class="grid-4" style="margin-top:20px">
+<div class="metric">
+<span>
+        Pending reservations
+       </span>
+<b>
+        0
+       </b>
+</div>
+<div class="metric">
+<span>
+        Occupied tables
+       </span>
+<b>
+        0
+       </b>
+</div>
+<div class="metric">
+<span>
+        Service requests
+       </span>
+<b>
+        0
+       </b>
+</div>
+<div class="metric">
+<span>
+        Awaiting bill
+       </span>
+<b>
+        0
+       </b>
+</div>
+</section>
+<section class="section">
+<h2>
+       Today's Reservations
+      </h2>
+<div class="empty">
+       No reservations.
+      </div>
+</section>
+<section class="section">
+<h2>
+       Pending Requests
+      </h2>
+<div class="empty">
+       No service requests.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Service Requests · Yumio" class="prototype-screen" data-source="staff-requests.html" id="staff-requests">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as staff@yumio.test
+      </div>
+<h1>
+       Service Requests
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#staff-dashboard">
+       Overview
+      </a>
+<a href="#staff-reservations">
+       Reservations
+      </a>
+<a href="#staff-tables">
+       Tables
+      </a>
+<a class="active" href="#staff-requests">
+       Requests
+      </a>
+</div>
+<section class="section">
+<div class="empty">
+       No service requests.
+      </div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Staff Reservations · Yumio" class="prototype-screen" data-source="staff-reservations.html" id="staff-reservations">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as staff@yumio.test
+      </div>
+<h1>
+       Reservations
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#staff-dashboard">
+       Overview
+      </a>
+<a class="active" href="#staff-reservations">
+       Reservations
+      </a>
+<a href="#staff-tables">
+       Tables
+      </a>
+<a href="#staff-requests">
+       Requests
+      </a>
+</div>
+<section class="section">
+<h2>
+       Reservation Queue
+      </h2>
+<div class="empty">Pending reservations will appear here.</div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Restaurant Tables · Yumio" class="prototype-screen" data-source="staff-tables.html" id="staff-tables">
+<div class="admin">
+<div class="admin-head"><a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in"><span class="brandmark"></span>Yumio</a>
+<div>
+<div class="greeting light">
+       Signed in as staff@yumio.test
+      </div>
+<h1>
+       Table Management
+      </h1>
+</div>
+<a class="btn btn-secondary" href="#login">
+      Sign Out
+     </a>
+</div>
+<main class="admin-body">
+<div class="admin-tabs">
+<a href="#staff-dashboard">
+       Overview
+      </a>
+<a href="#staff-reservations">
+       Reservations
+      </a>
+<a class="active" href="#staff-tables">
+       Tables
+      </a>
+<a href="#staff-requests">
+       Requests
+      </a>
+</div>
+<section class="section">
+<div class="table-grid">
+<div class="table-card">
+<strong>
+         Table 01
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         2 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 02
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         2 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 03
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         4 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 04
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         4 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 05
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         4 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 06
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         6 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 07
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         2 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 08
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         4 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 09
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         6 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+<div class="table-card">
+<strong>
+         Table 10
+        </strong>
+<div class="status" style="margin:8px 0">
+         Available
+        </div>
+<div class="meta">
+         4 seats
+        </div>
+<a class="linkbtn" href="#scan-table">
+         View QR
+        </a>
+</div>
+</div>
+</section>
+</main>
+</div>
+</section>
+<section aria-label="Table Connected · Yumio" class="prototype-screen" data-source="table-connected.html" id="table-connected">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Table connection
+       </div>
+<h1>
+        Table Status
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">No table</a>
+</div>
+<section class="card">
+<div class="empty">
+       No table is currently connected.
+      </div>
+<div class="actions">
+<a class="btn btn-dark" href="#scan-table">
+        Connect to a Table
+       </a>
+<a class="btn btn-secondary" href="#menu-breakfast">
+        Browse Menu
+       </a>
+</div>
+</section>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn active" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section>
+<section aria-label="Menu Item · Yumio" class="prototype-screen" data-source="dynamic" id="item-dynamic">
+<div class="shell">
+<header class="topbar">
+<a aria-label="Yumio - return to sign in" class="brand" href="#login" title="Return to sign in">
+<span class="brandmark">
+</span>
+      Yumio
+     </a>
+<span class="signed-area">
+      shanku@yumio.test
+     </span>
+</header><div class="screen-back-row">
+<button aria-label="Go back to previous screen" class="screen-back-button" data-action="go-back" type="button">
+<span aria-hidden="true">←</span>
+            Back
+          </button>
+</div>
+<main class="page">
+<div class="app-header">
+<div>
+<div class="greeting">
+        Breakfast
+       </div>
+<h1>
+        Maldivian Breakfast
+       </h1>
+</div>
+<a class="table-pill orange" href="#scan-table">
+       No table
+      </a>
+</div>
+<div class="item-layout">
+<div class="item-art">
+       🥣
+      </div>
+<section class="card">
+<div class="eyebrow">
+        Breakfast
+       </div>
+<h1>
+        Maldivian Breakfast
+       </h1>
+<h3>
+        MVR 85
+       </h3>
+<p>
+        Traditional Maldivian breakfast featuring authentic island flavors. Freshly prepared flatbread is served with aromatic tuna curry, creamy coconut-based dishes, spicy sambal, and tropical accompaniments. Simple, wholesome, and rich in local ingredients, it offers a perfect balance of savory flavors to start the day.
+       </p>
+<div class="field">
+<label>
+         Quantity
+        </label>
+<select>
+<option>
+          1
+         </option>
+<option>
+          2
+         </option>
+<option>
+          3
+         </option>
+</select>
+</div>
+<div class="field" style="margin-top:14px">
+<label>
+         Special instructions
+        </label>
+<textarea placeholder="Example: less spicy, sauce on the side" rows="3"></textarea>
+</div>
+<div class="actions">
+<a class="btn btn-primary btn-block" href="#cart">
+         Add to Cart
+        </a>
+<a class="btn btn-secondary btn-block" href="#menu-breakfast">
+         Back to Menu
+        </a>
+</div>
+</section>
+</div>
+</main>
+<nav class="bottomnav">
+<a class="navbtn" href="#customer-home">
+<span>⌂</span>
+            Home
+          </a>
+<a class="navbtn" href="#my-reservations">
+<span>▣</span>
+            My Reservation
+          </a>
+<a class="navbtn active" href="#orders">
+<span>◴</span>
+            Orders
+          </a>
+<a class="navbtn" href="#profile">
+<span>○</span>
+            Profile
+          </a>
+</nav>
+</div>
+</section><section aria-label="Sign in · Yumio" class="prototype-screen" data-source="index.html" id="login">
+<div class="ticket-login-shell">
+<main class="ticket-login-card">
+<div class="ticket-login-rule ticket-login-rule-top"></div>
+<div class="ticket-login-meta">
+<span>YUMIO · TABLE SERVICE</span>
+<span>WELCOME</span>
+</div>
+<div class="ticket-login-head">
+<div>
+<h1>Sign in</h1>
+<p>Access your table service</p>
+</div>
+<div class="ticket-login-stamp">RESERVE<br/>ORDER<br/>ENJOY</div>
+</div>
+<form action="#" class="ticket-login-form" id="login-form" novalidate="">
+<div class="ticket-login-field">
+<label for="login-email">EMAIL / USERNAME</label>
+<input autocomplete="username" id="login-email" name="email" placeholder="" required="" type="email"/>
+</div>
+<div class="ticket-login-field ticket-login-password-field">
+<label for="login-password">PASSWORD</label>
+<input autocomplete="current-password" id="login-password" name="password" placeholder="" required="" type="password"/>
+<button class="ticket-login-inline-note password-toggle" id="toggle-password" type="button">SHOW</button>
+</div>
+<div class="ticket-login-links">
+<a href="#forgot-password">Forgot password?</a>
+</div>
+<button class="ticket-login-button" type="submit">SIGN IN</button>
+<p class="ticket-login-error" id="login-error"></p></form>
+<div class="ticket-login-signup">
+        New guest? <a href="#register">Open a tab</a>
+</div>
+<div class="ticket-login-rule ticket-login-rule-bottom"></div>
+</main>
+</div>
+</section>
+<script src="app.js"></script><div aria-live="polite" class="yumio-toast" id="yumio-toast" role="status"></div></body>
+</html>
