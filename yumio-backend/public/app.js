@@ -903,6 +903,9 @@
     entry.quantity = Math.max(0, Math.min(50, entry.quantity + delta));
     if (entry.quantity === 0) cart.splice(cart.indexOf(entry), 1);
     saveCart(cart); renderMenuScreens(); renderCart(); updateCartSummary(); renderFloatingCart();
+    const quantity = cart.filter(x => x.id === id).reduce((sum, x) => sum + Number(x.quantity || 0), 0);
+    const cartTotal = cart.reduce((sum, x) => sum + Number(x.price || 0) * Number(x.quantity || 0), 0);
+    cartAnnouncement(`${item.name}, ${quantity} portions. Cart subtotal ${money(cartTotal)}.`);
     showToast(delta > 0 ? `${item.name} added to cart.` : 'Cart quantity updated.');
   }
   function renderMenuScreens() {
@@ -975,6 +978,12 @@
     card.innerHTML = `<div class="dynamic-stack">${rows}</div><div class="total-row grand"><span>Total</span><span>${money(total)}</span></div><div class="actions">${browse}${checkout}</div>`;
   }
 
+  let cartOpener = null;
+  const cartFocusSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  function cartAnnouncement(message) {
+    const region = document.getElementById('yumio-cart-announcement');
+    if (region) region.textContent = message;
+  }
   // Floating cart: uses the same localStorage cart as the existing checkout.
   function initFloatingCart() {
     const container = document.createElement('div');
@@ -984,6 +993,7 @@
       <aside id="yumio-cart-drawer" role="dialog" aria-modal="true" aria-label="Your cart" aria-hidden="true" tabindex="-1">
         <header class="yumio-drawer-head"><h2>Your Cart</h2><button type="button" id="yumio-cart-close" aria-label="Close cart">×</button></header>
         <div id="yumio-cart-drawer-items"></div><footer id="yumio-cart-drawer-footer"></footer>
+        <div id="yumio-cart-announcement" class="yumio-visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
       </aside>`;
     document.body.appendChild(container);
     container.querySelector('#yumio-cart-float').addEventListener('click', () => toggleFloatingCart(true));
@@ -999,8 +1009,26 @@
       if (control.dataset.drawerAction === 'remove') cart[index].quantity = 0;
       saveCart(cart.filter(row => row.quantity > 0));
       renderMenuScreens(); renderCart(); updateCartSummary(); renderFloatingCart();
+      const updated = loadCart();
+      const portions = updated.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
+      cartAnnouncement(`Cart updated. ${portions} portions. Subtotal ${money(updated.reduce((sum, row) => sum + Number(row.price || 0) * Number(row.quantity || 0), 0))}.`);
+      // Rendering replaces buttons. Put focus on the same quantity action, or the close button if removed.
+      const next = container.querySelector(`[data-drawer-action="${control.dataset.drawerAction}"][data-index="${index}"]`);
+      (next && !next.disabled ? next : container.querySelector('#yumio-cart-close'))?.focus({ preventScroll: true });
     });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape') toggleFloatingCart(false); });
+    document.addEventListener('keydown', event => {
+      const overlay = document.getElementById('yumio-cart-overlay');
+      if (!overlay?.classList.contains('yumio-cart-open')) return;
+      if (event.key === 'Escape') { event.preventDefault(); toggleFloatingCart(false); return; }
+      if (event.key !== 'Tab') return;
+      const dialog = overlay.querySelector('#yumio-cart-drawer');
+      const controls = [...dialog.querySelectorAll(cartFocusSelector)].filter(el => el.getClientRects().length);
+      if (!controls.length) { event.preventDefault(); dialog.focus(); return; }
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
+      else if (!dialog.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
+    });
     window.addEventListener('hashchange', () => toggleFloatingCart(false));
     renderFloatingCart();
   }
@@ -1008,19 +1036,25 @@
     const overlay = document.getElementById('yumio-cart-overlay'); if (!overlay) return;
     const drawer = overlay.querySelector('#yumio-cart-drawer');
     const open = !!show && currentSession()?.role === 'customer';
+    const wasOpen = overlay.classList.contains('yumio-cart-open');
+    if (open && !wasOpen) cartOpener = document.activeElement;
     overlay.classList.toggle('yumio-cart-open', open);
     drawer.setAttribute('aria-hidden', String(!open));
     overlay.querySelector('#yumio-cart-float').setAttribute('aria-expanded', String(open));
     overlay.querySelector('#yumio-cart-backdrop').hidden = !open;
     document.body.classList.toggle('yumio-cart-no-scroll', open);
-    if (open) { renderFloatingCart(); drawer.focus(); }
-    else overlay.querySelector('#yumio-cart-float')?.focus({ preventScroll: true });
+    if (open) { renderFloatingCart(); overlay.querySelector('#yumio-cart-close')?.focus({ preventScroll: true }); }
+    else if (wasOpen) {
+      const target = cartOpener?.isConnected && !cartOpener.hidden ? cartOpener : overlay.querySelector('#yumio-cart-float');
+      target?.focus({ preventScroll: true });
+      cartOpener = null;
+    }
   }
   function renderFloatingCart() {
     const overlay = document.getElementById('yumio-cart-overlay'); if (!overlay) return;
     const show = currentSession()?.role === 'customer' && (screenId().startsWith('menu-') || screenId() === 'cart' || screenId() === 'item-dynamic' || /^item-\d+$/.test(screenId()));
     overlay.querySelector('#yumio-cart-float').hidden = !show;
-    if (!show) { overlay.classList.remove('yumio-cart-open'); overlay.querySelector('#yumio-cart-backdrop').hidden = true; document.body.classList.remove('yumio-cart-no-scroll'); }
+    if (!show && overlay.classList.contains('yumio-cart-open')) toggleFloatingCart(false);
     const cart = loadCart();
     const count = cart.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
     const total = cart.reduce((sum, row) => sum + Number(row.price || 0) * Number(row.quantity || 0), 0);
@@ -1677,6 +1711,15 @@
     document.querySelector(`[data-history-filter="${screen}"]`)?.addEventListener('change', () => renderRoleHistory(screen));
   });
 
+  function setupAccessibilityNavigation() {
+    document.getElementById('yumio-skip-content')?.addEventListener('click', () => {
+      const screen = document.getElementById(screenId());
+      const main = screen?.querySelector('main');
+      if (!main) return;
+      if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+      main.focus({ preventScroll: false });
+    });
+  }
   function renderAll() { updateCustomerTableUI(); updateReservationTableOptions(); renderMenuScreens(); renderCart(); renderFloatingCart(); renderReservationDetails(); renderReservationConfirmation(); renderCustomerReservations(); renderTableConnected(); renderOrderConfirmation(); renderOrders(); renderOrderTracking(); renderServiceRequestSent(); renderBill(); renderPayment(); renderPaymentSuccess(); renderStaff(); renderKitchen(); renderManager(); renderCustomerHistory(); renderRoleHistory('staff-history'); renderRoleHistory('kitchen-history'); renderRoleHistory('manager-visit-history'); const id = screenId(); if (/^item-\d+$/.test(id) || id === 'item-dynamic') renderItemPage(id); }
   function handleRoute() {
     if (!guardRoute()) return;
@@ -1693,7 +1736,7 @@
     }
   }
   async function boot() {
-    loadState(); prepareMenuSections(); await syncMenuSchedule(); initLogin(); initReservation(); initTables(); initCart(); initFloatingCart(); initServiceRequests(); initManagerForms();
+    loadState(); prepareMenuSections(); await syncMenuSchedule(); initLogin(); initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
     menuClockTimer = setInterval(() => { if (currentSession()?.role === 'customer' && screenId().startsWith('menu-')) renderMenuScreens(); }, 30000);
     window.addEventListener('hashchange', handleRoute);
     try {
