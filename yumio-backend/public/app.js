@@ -314,6 +314,35 @@
     return true;
   }
 
+  function initRegistration() {
+    const form = document.getElementById('register-form');
+    const errorBox = document.getElementById('register-error');
+    form?.addEventListener('submit', async event => {
+      event.preventDefault();
+      const name = document.getElementById('register-full-name')?.value.trim() || '';
+      const email = document.getElementById('register-email')?.value.trim().toLowerCase() || '';
+      const password = document.getElementById('register-password')?.value || '';
+      const confirm_password = document.getElementById('register-confirm-password')?.value || '';
+      if (errorBox) errorBox.textContent = '';
+      if (password !== confirm_password) {
+        if (errorBox) errorBox.textContent = 'Passwords do not match.';
+        return;
+      }
+      const submit = form.querySelector('button[type="submit"]');
+      if (submit) submit.disabled = true;
+      try {
+        await apiRequest('/auth/register', { method: 'POST', body: JSON.stringify({ full_name: name, email, password, confirm_password }) });
+        form.reset();
+        location.hash = '#login';
+        const loginEmail = document.getElementById('login-email');
+        if (loginEmail) loginEmail.value = email;
+        showToast('Account created! Please sign in.');
+      } catch (err) {
+        if (errorBox) errorBox.textContent = err.message || 'Registration failed.';
+      } finally { if (submit) submit.disabled = false; }
+    });
+  }
+
   function initLogin() {
     const form = document.getElementById('login-form'), email = document.getElementById('login-email'), password = document.getElementById('login-password'), error = document.getElementById('login-error'), toggle = document.getElementById('toggle-password');
     const clearError = () => { if (error) { error.textContent = ''; error.style.display = 'none'; } };
@@ -1736,7 +1765,7 @@
     }
   }
   async function boot() {
-    loadState(); prepareMenuSections(); await syncMenuSchedule(); initLogin(); initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
+    loadState(); prepareMenuSections(); await syncMenuSchedule(); initLogin(); initRegistration(); initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
     menuClockTimer = setInterval(() => { if (currentSession()?.role === 'customer' && screenId().startsWith('menu-')) renderMenuScreens(); }, 30000);
     window.addEventListener('hashchange', handleRoute);
     try {

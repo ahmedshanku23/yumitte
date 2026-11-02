@@ -8,6 +8,7 @@
         <meta content="Yumio restaurant reservation and dine-in ordering." name="description" />
         <title>Yumio</title>
         <link href="styles.css" rel="stylesheet" />
+
 </head>
 
 <body class="single-file-prototype">
@@ -5192,45 +5193,46 @@
                 </div>
         </section>
         <section aria-label="Create account · Yumio" class="prototype-screen" data-source="register.html" id="register">
-                <div class="shell">
-                        <header class="topbar">
-                                <a class="brand" href="#login">
-                                        <span class="brandmark">
-                                        </span>
-                                        Yumio
-                                </a>
-                        </header>
-                        <div class="screen-back-row">
-                                <button aria-label="Go back to previous screen" class="screen-back-button"
-                                        data-action="go-back" type="button">
-                                        <span aria-hidden="true">←</span>
-                                        Back
-                                </button>
-                        </div>
-                        <div class="auth-wrap">
-                                <main class="auth-card">
-                                        <div class="ticket-meta">
-                                                <span>
-                                                        Yumio · Accounts
-                                                </span>
-                                                <span>ACCOUNT</span>
+                <div class="ticket-login-shell">
+                        <main class="ticket-login-card">
+                                <div class="ticket-login-rule ticket-login-rule-top"></div>
+                                <div class="ticket-login-meta"><span>YUMIO · TABLE SERVICE</span><span>JOIN US</span>
+                                </div>
+                                <div class="ticket-login-head">
+                                        <div>
+                                                <h1>Create account</h1>
+                                                <p>Start your table service experience</p>
                                         </div>
-                                        <div class="ticket-head">
-                                                <div>
-                                                        <h1>
-                                                                Registration
-                                                        </h1>
-                                                        <p class="muted">Account creation is currently unavailable.</p>
-                                                </div>
+                                        <div class="ticket-login-stamp" aria-hidden="true">RESERVE<br>ORDER<br>ENJOY
                                         </div>
-
-                                        <div class="actions">
-                                                <a class="btn btn-dark btn-block" href="#login">
-                                                        Back to Sign In
-                                                </a>
+                                </div>
+                                <form id="register-form" class="ticket-login-form">
+                                        <div class="ticket-login-field"><label for="register-full-name">FULL
+                                                        NAME</label><input id="register-full-name" name="full_name"
+                                                        type="text" autocomplete="name" maxlength="150" required></div>
+                                        <div class="ticket-login-field"><label for="register-email">EMAIL
+                                                        ADDRESS</label><input id="register-email" name="email"
+                                                        type="email" autocomplete="email" maxlength="254" required>
                                         </div>
-                                </main>
-                        </div>
+                                        <div class="ticket-login-field"><label
+                                                        for="register-password">PASSWORD</label><input
+                                                        id="register-password" name="password" type="password"
+                                                        autocomplete="new-password" minlength="8"
+                                                        aria-describedby="register-password-hint" required><span
+                                                        class="register-hint" id="register-password-hint">At least 8
+                                                        characters</span></div>
+                                        <div class="ticket-login-field"><label for="register-confirm-password">CONFIRM
+                                                        PASSWORD</label><input id="register-confirm-password"
+                                                        name="confirm_password" type="password"
+                                                        autocomplete="new-password" minlength="8" required></div>
+                                        <p id="register-error" class="ticket-login-error" role="alert"
+                                                aria-live="assertive"></p>
+                                        <button type="submit" class="ticket-login-button">CREATE ACCOUNT</button>
+                                </form>
+                                <div class="ticket-login-signup">Already have an account? <a href="#login">Sign in</a>
+                                </div>
+                                <div class="ticket-login-rule ticket-login-rule-bottom"></div>
+                        </main>
                 </div>
         </section>
         <section aria-label="Reservation Confirmed · Yumio" class="prototype-screen"

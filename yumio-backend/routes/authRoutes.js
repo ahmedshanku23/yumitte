@@ -5,12 +5,47 @@ const pool = require('../config/db');
 
 const router = express.Router();
 
+// Public signup creates customer accounts only. Never accept a role from the browser.
+router.post('/register', async (req, res) => {
+  const { full_name, email, password, confirm_password } = req.body || {};
+  const name = typeof full_name === 'string' ? full_name.trim().replace(/\s+/g, ' ') : '';
+  const mail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+  if (name.length < 2 || name.length > 150) {
+    return res.status(400).json({ success: false, message: 'Full name must be 2–150 characters.' });
+  }
+  if (mail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+    return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
+  }
+  if (typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 8 characters and at most 72 bytes.' });
+  }
+  if (password !== confirm_password) {
+    return res.status(400).json({ success: false, message: 'Passwords do not match.' });
+  }
+
+  try {
+    const hash = await bcrypt.hash(password, 12);
+    await pool.execute(
+      `INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, 'customer')`,
+      [name, mail, hash]
+    );
+    return res.status(201).json({ success: true, message: 'Customer account created. You can now sign in.' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ success: false, message: 'An account with that email already exists.' });
+    }
+    console.error('Registration error:', error.code || error.message);
+    return res.status(500).json({ success: false, message: 'Unable to create account. Check backend logs.' });
+  }
+});
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body || {};
 
   if (typeof email !== 'string' ||
-      typeof password !== 'string' ||
-      !email.trim() || !password) {
+    typeof password !== 'string' ||
+    !email.trim() || !password) {
     return res.status(400).json({
       success: false,
       message: 'Email and password are required'

@@ -2253,3 +2253,313 @@ body:has(.prototype-screen:not(#login):target) #login {
     transition: none
   }
 }
+
+/* Yumio registration theme — visually matches ticket-style Sign In */
+#register .ticket-login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+}
+
+#register .ticket-login-card {
+  width: min(100%, 480px);
+  background: #f7f2e8;
+  border: 1px solid #e5dac4;
+  padding: 28px 28px 26px;
+  box-shadow: none;
+}
+
+#register .ticket-login-rule {
+  border-top: 2px dashed #d8c4a1;
+  width: 100%;
+}
+
+#register .ticket-login-rule-top {
+  margin: 0 0 26px;
+}
+
+#register .ticket-login-rule-bottom {
+  margin: 26px 0 0;
+}
+
+#register .ticket-login-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  color: #9b825b;
+  font-size: .95rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+#register .ticket-login-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+#register .ticket-login-head h1 {
+  margin: 0;
+  color: #1f1b16;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+#register .ticket-login-head p {
+  margin: 6px 0 0;
+  color: #9f7440;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+}
+
+#register .ticket-login-stamp {
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+  border: 2px solid #dd6e43;
+  border-radius: 50%;
+  color: #dd6e43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: .78rem;
+  line-height: 1.15;
+  letter-spacing: .06em;
+  font-weight: 700;
+  transform: rotate(-8deg);
+  margin-top: 4px;
+  background: transparent;
+}
+
+#register .ticket-login-form {
+  margin-top: 10px;
+}
+
+#register .ticket-login-field {
+  position: relative;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 2px dotted #e6dcc9;
+}
+
+#register .ticket-login-field label {
+  display: block;
+  margin: 0 0 16px;
+  color: #9b825b;
+  font-size: .98rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+#register .ticket-login-field input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  height: auto;
+  border-radius: 0;
+  font-size: 1.05rem;
+  color: #2d241a;
+  outline: none;
+}
+
+#register .ticket-login-field input::placeholder {
+  color: #b8ac97;
+}
+
+#register .ticket-login-password-field {
+  padding-bottom: 20px;
+}
+
+#register .ticket-login-inline-note {
+  position: absolute;
+  right: 0;
+  bottom: 18px;
+  color: #9b825b;
+  font-size: .82rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+#register .ticket-login-links {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 24px;
+}
+
+#register .ticket-login-links a {
+  color: #9b7441;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#register .ticket-login-links a:hover {
+  text-decoration: underline;
+}
+
+#register .ticket-login-button {
+  width: 100%;
+  border: none;
+  border-radius: 2px;
+  background: #2e2218;
+  color: #fffef9;
+  padding: 16px 20px;
+  font-size: 1.42rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+#register .ticket-login-signup {
+  margin-top: 24px;
+  text-align: center;
+  color: #9b7441;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+}
+
+#register .ticket-login-signup a {
+  color: #c65d2d;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 2px;
+}
+
+#register .ticket-login-signup a:hover {
+  text-decoration: underline;
+}
+
+#register .ticket-login-helper {
+  margin: 0 0 16px;
+  color: #8b7a62;
+  font-size: .95rem;
+  line-height: 1.5;
+}
+
+#register .ticket-login-error {
+  display: none;
+  margin: 16px 0 0;
+  color: #b1432d;
+  font-size: .95rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+#register {
+  background: #efe8d8;
+}
+
+#register .ticket-login-shell {
+  min-height: 100vh;
+}
+
+#register .ticket-login-card {
+  max-width: 480px;
+}
+
+#register .ticket-login-head h1 {
+  font-size: clamp(2.1rem, 6vw, 3rem);
+}
+
+#register .ticket-login-field input:focus-visible {
+  outline: 2px solid #9f7440;
+  outline-offset: 5px;
+}
+
+#register .ticket-login-button:focus-visible,
+#register .ticket-login-signup a:focus-visible {
+  outline: 3px solid #b75d28;
+  outline-offset: 4px;
+}
+
+#register .register-hint {
+  display: block;
+  margin-top: 8px;
+  color: #826f5b;
+  font-size: .81rem;
+}
+
+#register .ticket-login-error {
+  min-height: 1.2em;
+  color: #9b2d2d;
+}
+
+@media (max-width:540px) {
+  #register .ticket-login-shell {
+    padding: 14px;
+  }
+
+  #register .ticket-login-card {
+    padding: 22px 18px;
+  }
+
+  #register .ticket-login-stamp {
+    width: 64px;
+    height: 64px;
+    font-size: .6rem;
+  }
+}
+
+#login .ticket-login-field input,
+#signup .ticket-login-field input {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+}
+
+#login .ticket-login-field input:hover,
+#login .ticket-login-field input:focus,
+#signup .ticket-login-field input:hover,
+#signup .ticket-login-field input:focus {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+#login .ticket-login-field:focus-within,
+#signup .ticket-login-field:focus-within {
+    border-bottom: 2px solid #9b825b;
+}
+
+#login input,
+#register input,
+#signup input {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+#login input:hover,
+#login input:focus,
+#login input:focus-visible,
+#register input:hover,
+#register input:focus,
+#register input:focus-visible,
+#signup input:hover,
+#signup input:focus,
+#signup input:focus-visible {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+#login .ticket-login-field:focus-within,
+#register .ticket-register-field:focus-within,
+#signup .ticket-signup-field:focus-within {
+  border-bottom: 2px solid #9b825b;
+}
