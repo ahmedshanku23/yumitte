@@ -317,15 +317,21 @@
   function initRegistration() {
     const form = document.getElementById('register-form');
     const errorBox = document.getElementById('register-error');
-    form?.addEventListener('submit', async event => {
+    const showRegistrationError = message => {
+      if (!errorBox) { showToast(message); return; }
+      errorBox.textContent = message;
+      errorBox.style.display = message ? 'block' : 'none';
+    };
+    if (!form) { console.error('Yumio registration form #register-form not found'); return; }
+    form.addEventListener('submit', async event => {
       event.preventDefault();
       const name = document.getElementById('register-full-name')?.value.trim() || '';
       const email = document.getElementById('register-email')?.value.trim().toLowerCase() || '';
       const password = document.getElementById('register-password')?.value || '';
       const confirm_password = document.getElementById('register-confirm-password')?.value || '';
-      if (errorBox) errorBox.textContent = '';
+      showRegistrationError('');
       if (password !== confirm_password) {
-        if (errorBox) errorBox.textContent = 'Passwords do not match.';
+        showRegistrationError('Passwords do not match.');
         return;
       }
       const submit = form.querySelector('button[type="submit"]');
@@ -338,7 +344,7 @@
         if (loginEmail) loginEmail.value = email;
         showToast('Account created! Please sign in.');
       } catch (err) {
-        if (errorBox) errorBox.textContent = err.message || 'Registration failed.';
+        showRegistrationError(err.message || 'Registration failed.');
       } finally { if (submit) submit.disabled = false; }
     });
   }
@@ -1330,7 +1336,7 @@
     target.innerHTML = `<div class="card"><div class="section-head"><div><strong>${esc(o.id)} · Table ${esc(o.tableId)}</strong><div class="meta">${money(o.total)}</div></div><span class="status">${esc(o.status)}</span></div><div class="dynamic-stack">${steps.map((step, i) => `<div class="dynamic-row"><span>${i <= current ? '●' : '○'} ${esc(step)}</span><span>${i === current ? 'Current' : i < current ? 'Done' : ''}</span></div>`).join('')}</div></div>`;
   }
 
-  function initServiceRequests() { document.querySelectorAll('#service-requests .grid-2 a.card').forEach(card => card.addEventListener('click', e => { e.preventDefault(); const s = loadState(); if (!s.customerTableId) { showToast('Check in or connect to a table before sending a service request.'); location.hash = '#reserve'; return; } const activeTable = s.tables.find(t => t.id === s.customerTableId); if (!activeTable || activeTable.status !== 'Occupied') return showToast('This dining session is no longer active.'); const title = card.querySelector('h3')?.textContent.trim().replace(/^\S+\s*/, '') || 'Other'; s.serviceRequests.push({ id: nextId('REQ', s.serviceRequests), customerEmail: 'shanku@yumio.test', tableId: s.customerTableId, type: title, status: 'Pending', createdAt: nowLabel() }); saveState(s); renderAll(); location.hash = '#service-request-sent'; })); }
+  function initServiceRequests() { document.querySelectorAll('#service-requests .grid-2 a.card').forEach(card => card.addEventListener('click', e => { e.preventDefault(); const s = loadState(); if (!s.customerTableId) { showToast('Check in or connect to a table before sending a service request.'); location.hash = '#reserve'; return; } const activeTable = s.tables.find(t => t.id === s.customerTableId); if (!activeTable || activeTable.status !== 'Occupied') return showToast('This dining session is no longer active.'); const title = card.querySelector('h3')?.textContent.trim().replace(/^\S+\s*/, '') || 'Other'; s.serviceRequests.push({ id: nextId('REQ', s.serviceRequests), customerEmail: currentSession()?.email || '', tableId: s.customerTableId, type: title, status: 'Pending', createdAt: nowLabel() }); saveState(s); renderAll(); location.hash = '#service-request-sent'; })); }
   function renderServiceRequestSent() { const s = loadState(), r = s.serviceRequests.at(-1), e = document.querySelector('#service-request-sent .empty'); if (e) e.innerHTML = r ? `<strong>${esc(r.type)} request sent.</strong><br>Table ${esc(r.tableId)} · Status: ${esc(r.status)}` : 'No service request has been sent yet.'; }
 
   // Step 15.6: use authoritative MySQL billing data for the selected dining session.
@@ -1593,7 +1599,7 @@
       const reservations = newestFirst(s.reservations
         .filter(r => r.customerEmail === currentSession()?.email));
 
-      const walkInOrders = newestFirst(s.orders.filter(o => o.customerEmail === 'shanku@yumio.test' && !o.reservationId));
+      const walkInOrders = newestFirst(s.orders.filter(o => o.customerEmail === currentSession()?.email && !o.reservationId));
 
       let html = '<h2>Reservation & Order History</h2>';
 
@@ -1603,7 +1609,7 @@
         html += '<div class="dynamic-stack">';
 
         reservations.forEach(r => {
-          const orders = newestFirst(s.orders.filter(o => o.customerEmail === 'shanku@yumio.test' && o.reservationId === r.id));
+          const orders = newestFirst(s.orders.filter(o => o.customerEmail === currentSession()?.email && o.reservationId === r.id));
           html += `<div class="card history-reservation-card">
             <div class="section-head">
               <div>
@@ -1682,8 +1688,8 @@
     if (activity) {
       activity.querySelector('.empty,.dynamic-stack')?.remove();
       const recent = [];
-      newestFirst(s.reservations).slice(0, 1).forEach(r => recent.push({ title: `Reservation ${r.id}`, meta: `${formatDate(r.date)} · ${r.status}` }));
-      newestFirst(s.orders).slice(0, 1).forEach(o => recent.push({ title: `Order ${o.id}`, meta: `${money(o.total)} · ${o.status}` }));
+      newestFirst(s.reservations.filter(r => r.customerEmail === currentSession()?.email)).slice(0, 1).forEach(r => recent.push({ title: `Reservation ${r.id}`, meta: `${formatDate(r.date)} · ${r.status}` }));
+      newestFirst(s.orders.filter(o => o.customerEmail === currentSession()?.email)).slice(0, 1).forEach(o => recent.push({ title: `Order ${o.id}`, meta: `${money(o.total)} · ${o.status}` }));
       const d = document.createElement('div');
       d.className = recent.length ? 'dynamic-stack' : 'empty';
       d.innerHTML = recent.length
@@ -1749,7 +1755,33 @@
       main.focus({ preventScroll: false });
     });
   }
-  function renderAll() { updateCustomerTableUI(); updateReservationTableOptions(); renderMenuScreens(); renderCart(); renderFloatingCart(); renderReservationDetails(); renderReservationConfirmation(); renderCustomerReservations(); renderTableConnected(); renderOrderConfirmation(); renderOrders(); renderOrderTracking(); renderServiceRequestSent(); renderBill(); renderPayment(); renderPaymentSuccess(); renderStaff(); renderKitchen(); renderManager(); renderCustomerHistory(); renderRoleHistory('staff-history'); renderRoleHistory('kitchen-history'); renderRoleHistory('manager-visit-history'); const id = screenId(); if (/^item-\d+$/.test(id) || id === 'item-dynamic') renderItemPage(id); }
+  // Keep account details tied to the currently authenticated backend session.
+  function renderSignedInIdentity() {
+    const user = currentSession();
+    if (!user) return;
+    const email = String(user.email || '');
+    const name = String(user.name || '').trim() || email.split('@')[0] || 'Customer';
+    // The original HTML contains a hardcoded test account in every header.
+    document.querySelectorAll('.prototype-screen .signed-area').forEach(el => {
+      el.textContent = email;
+    });
+    if (user.role !== 'customer') return;
+    const hour = new Date().getHours();
+    const salutation = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const greeting = document.querySelector('#customer-home .app-header .greeting');
+    if (greeting) greeting.textContent = `${salutation}, ${name.split(/\s+/)[0]}`;
+    const profile = document.getElementById('profile');
+    if (profile) {
+      const title = profile.querySelector('.profile-card h2');
+      const address = profile.querySelector('.profile-card p');
+      const avatar = profile.querySelector('.profile-card .avatar');
+      if (title) title.textContent = name;
+      if (address) address.textContent = email;
+      if (avatar) avatar.textContent = name.charAt(0).toUpperCase();
+    }
+  }
+
+  function renderAll() { renderSignedInIdentity(); updateCustomerTableUI(); updateReservationTableOptions(); renderMenuScreens(); renderCart(); renderFloatingCart(); renderReservationDetails(); renderReservationConfirmation(); renderCustomerReservations(); renderTableConnected(); renderOrderConfirmation(); renderOrders(); renderOrderTracking(); renderServiceRequestSent(); renderBill(); renderPayment(); renderPaymentSuccess(); renderStaff(); renderKitchen(); renderManager(); renderCustomerHistory(); renderRoleHistory('staff-history'); renderRoleHistory('kitchen-history'); renderRoleHistory('manager-visit-history'); const id = screenId(); if (/^item-\d+$/.test(id) || id === 'item-dynamic') renderItemPage(id); }
   function handleRoute() {
     if (!guardRoute()) return;
     renderAll();
@@ -1765,7 +1797,10 @@
     }
   }
   async function boot() {
-    loadState(); prepareMenuSections(); await syncMenuSchedule(); initLogin(); initRegistration(); initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
+    initRegistration(); initLogin();
+    loadState(); prepareMenuSections();
+    try { await syncMenuSchedule(); } catch (error) { console.warn('Menu schedule unavailable during startup:', error); }
+    initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
     menuClockTimer = setInterval(() => { if (currentSession()?.role === 'customer' && screenId().startsWith('menu-')) renderMenuScreens(); }, 30000);
     window.addEventListener('hashchange', handleRoute);
     try {
