@@ -13,6 +13,8 @@ const kitchenRoutes = require('./routes/kitchenRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const staffTablesRoutes = require('./routes/staffTablesRoutes');
 
+const { startNotificationWorker } = require('./services/emailNotifications');
+
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
@@ -78,6 +80,7 @@ app.use('/api/staff', staffTablesRoutes);
 // Start server only once
 const server = app.listen(PORT, '127.0.0.1', () => {
   console.log(`Yumio API running on http://localhost:${PORT}`);
+  startNotificationWorker();
 });
 
 server.on('error', (error) => {

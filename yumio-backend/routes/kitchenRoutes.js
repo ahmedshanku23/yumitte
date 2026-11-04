@@ -4,6 +4,7 @@ const pool = require('../config/db');
 const { requireRole } = require('../middleware/authMiddleware');
 
 const router = express.Router();
+const { queueNotification } = require('../services/emailNotifications');
 
 // Kitchen: view scheduled, deposit-paid pre-orders
 router.get(
@@ -220,6 +221,7 @@ router.patch(
         ]
       );
 
+      await queueNotification(connection, `order_${newStatus}`, orderId);
       await connection.commit();
       transactionStarted = false;
 

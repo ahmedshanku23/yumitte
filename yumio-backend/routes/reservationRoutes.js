@@ -5,6 +5,7 @@ const { requireRole } =
   require('../middleware/authMiddleware');
 
 const router = express.Router();
+const { queueNotification } = require('../services/emailNotifications');
 
 // CUSTOMER: CREATE RESERVATION
 router.post('/', requireRole('customer'), async (req, res) => {
@@ -331,6 +332,7 @@ router.patch(
         ]
       );
 
+      await queueNotification(connection, 'reservation_confirmed', id);
       await connection.commit();
 
       res.json({
