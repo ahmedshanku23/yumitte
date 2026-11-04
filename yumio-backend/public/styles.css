@@ -2511,55 +2511,315 @@ body:has(.prototype-screen:not(#login):target) #login {
   }
 }
 
-#login .ticket-login-field input,
-#signup .ticket-login-field input {
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    outline: none;
+/* Password recovery: progressive stages; preserve hidden attribute under any page CSS. */
+#forgot-password [hidden] {
+  display: none !important;
 }
 
-#login .ticket-login-field input:hover,
-#login .ticket-login-field input:focus,
-#signup .ticket-login-field input:hover,
-#signup .ticket-login-field input:focus {
-    border: none;
-    background: transparent;
-    box-shadow: none;
+#forgot-password .reset-instruction {
+  margin: 18px 0 14px;
+  color: #215a4c;
+  line-height: 1.55;
 }
 
-#login .ticket-login-field:focus-within,
-#signup .ticket-login-field:focus-within {
-    border-bottom: 2px solid #9b825b;
+#forgot-password .reset-resend {
+  border: 0;
+  background: transparent;
+  padding: 10px 0;
+  cursor: pointer;
 }
 
-#login input,
-#register input,
-#signup input {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  background: transparent !important;
+#forgot-password #reset-feedback:not(:empty) {
+  margin-top: 14px;
+  color: #215a4c;
 }
 
-#login input:hover,
-#login input:focus,
-#login input:focus-visible,
-#register input:hover,
-#register input:focus,
-#register input:focus-visible,
-#signup input:hover,
-#signup input:focus,
-#signup input:focus-visible {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
+#forgot-password #reset-feedback.reset-error {
+  color: #a52d28;
 }
 
-#login .ticket-login-field:focus-within,
-#register .ticket-register-field:focus-within,
-#signup .ticket-signup-field:focus-within {
+#forgot-password .auth-form button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+#forgot-password {
+  background: #ece5d6;
+  color: #2d241a;
+}
+
+#forgot-password>.shell {
+  min-height: 100vh;
+}
+
+#forgot-password .topbar,
+#forgot-password .screen-back-row {
+  display: none;
+}
+
+#forgot-password .auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+}
+
+#forgot-password .auth-card {
+  width: min(100%, 480px);
+  max-width: 480px;
+  background: #f7f2e8;
+  border: 1px solid #e5dac4;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 28px 28px 26px;
+}
+
+/* The top and bottom dashed ticket rules. */
+#forgot-password .auth-card::before,
+#forgot-password .auth-card::after {
+  content: '';
+  display: block;
+  width: 100%;
+  border-top: 2px dashed #d8c4a1;
+}
+
+#forgot-password .auth-card::before {
+  margin: 0 0 26px;
+}
+
+#forgot-password .auth-card::after {
+  margin: 26px 0 0;
+}
+
+#forgot-password .ticket-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  margin: 0 0 22px;
+  border: 0;
+  color: #9b825b;
+  font: 400 .95rem/1.4 Inter, Arial, sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+#forgot-password .ticket-head {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 0;
+  margin: 0 0 22px;
+}
+
+#forgot-password .ticket-head::after {
+  content: 'RESERVE\a ORDER\a ENJOY';
+  white-space: pre;
+  flex: 0 0 88px;
+  width: 88px;
+  height: 88px;
+  border: 2px solid #dd6e43;
+  border-radius: 50%;
+  color: #dd6e43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font: 700 .78rem/1.15 Inter, Arial, sans-serif;
+  letter-spacing: .06em;
+  transform: rotate(-8deg);
+  margin-top: 4px;
+}
+
+#forgot-password .ticket-head h1 {
+  margin: 0;
+  color: #1f1b16;
+  font: 500 clamp(2.1rem, 6vw, 3rem)/1.05 Georgia, 'Times New Roman', serif;
+}
+
+#forgot-password .ticket-head p {
+  margin: 6px 0 0;
+  color: #9f7440;
+  font: 400 1.15rem/1.4 Georgia, 'Times New Roman', serif;
+}
+
+#forgot-password #reset-request-help {
+  margin: 0 0 21px;
+  color: #826f5b;
+  font-size: .9rem;
+}
+
+#forgot-password .auth-form {
+  display: grid;
+  gap: 0;
+  margin-top: 10px;
+}
+
+#forgot-password .auth-form .field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 2px dotted #e6dcc9;
+}
+
+#forgot-password .auth-form .field label {
+  display: block;
+  margin: 0 0 16px;
+  color: #9b825b;
+  font: 700 .98rem/1.4 Inter, Arial, sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+#forgot-password .auth-form .field input,
+#forgot-password .auth-form .field input:hover,
+#forgot-password .auth-form .field input:focus,
+#forgot-password .auth-form .field input:focus-visible {
+  appearance: none;
+  width: 100%;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  color: #2d241a;
+  font-size: 1.05rem;
+}
+
+#forgot-password .auth-form .field input::placeholder {
+  color: #b8ac97;
+}
+
+#forgot-password .auth-form .field:focus-within {
   border-bottom: 2px solid #9b825b;
+}
+
+#forgot-password .auth-form .btn,
+#forgot-password .auth-form .btn.btn-dark {
+  width: 100%;
+  min-height: 55px;
+  padding: 16px 20px;
+  border: 0;
+  border-radius: 2px;
+  background: #2e2218;
+  color: #fffef9;
+  font-size: clamp(1.12rem, 3.5vw, 1.42rem);
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+#forgot-password .auth-form .btn:hover {
+  background: #443124;
+}
+
+#forgot-password .auth-form .btn:focus-visible,
+#forgot-password .auth-link-row a:focus-visible,
+#forgot-password .reset-resend:focus-visible {
+  outline: 3px solid #b75d28;
+  outline-offset: 4px;
+}
+
+#forgot-password #reset-otp-step,
+#forgot-password #reset-new-password-step {
+  margin-top: 8px;
+}
+
+#forgot-password .reset-instruction {
+  margin: 6px 0 20px;
+  color: #826f5b;
+  line-height: 1.55;
+}
+
+#forgot-password .reset-resend {
+  display: block;
+  margin: 10px auto 0;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  color: #c65d2d;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#forgot-password .reset-resend:hover {
+  text-decoration: underline;
+}
+
+#forgot-password #reset-feedback:not(:empty) {
+  margin: 16px 0 0;
+  color: #215a4c;
+  font-size: .94rem;
+  font-weight: 600;
+}
+
+#forgot-password #reset-feedback.reset-error {
+  color: #a52d28;
+}
+
+#forgot-password .auth-link-row {
+  margin: 24px 0 0;
+  text-align: center;
+  color: #9b7441;
+  font: 400 1.05rem/1.4 Georgia, 'Times New Roman', serif;
+}
+
+#forgot-password .auth-link-row a {
+  color: #c65d2d;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+#forgot-password .auth-link-row a:hover {
+  text-decoration: underline;
+}
+
+#forgot-password [hidden] {
+  display: none !important;
+}
+
+#forgot-password .auth-form button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+@media (max-width: 540px) {
+  #forgot-password .auth-wrap {
+    padding: 14px;
+  }
+
+  #forgot-password .auth-card {
+    padding: 22px 18px 20px;
+  }
+
+  #forgot-password .ticket-meta {
+    font-size: .78rem;
+    letter-spacing: .1em;
+  }
+
+  #forgot-password .ticket-head {
+    gap: 12px;
+  }
+
+  #forgot-password .ticket-head::after {
+    flex-basis: 64px;
+    width: 64px;
+    height: 64px;
+    font-size: .6rem;
+  }
+
+  #forgot-password .ticket-head p {
+    font-size: 1rem;
+  }
 }

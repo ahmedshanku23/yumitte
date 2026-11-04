@@ -349,6 +349,89 @@
     });
   }
 
+  function initPasswordRecovery() {
+    const requestForm = document.getElementById('password-reset-request-form');
+    if (!requestForm) return;
+    const verifyForm = document.getElementById('password-reset-verify-form');
+    const completeForm = document.getElementById('password-reset-complete-form');
+    const otpStep = document.getElementById('reset-otp-step');
+    const passwordStep = document.getElementById('reset-new-password-step');
+    const feedback = document.getElementById('reset-feedback');
+    const emailField = document.getElementById('reset-email');
+    let resetToken = null;
+    let targetEmail = '';
+    const report = (text, error = false) => {
+      feedback.textContent = text;
+      feedback.classList.toggle('reset-error', error);
+    };
+    const withBusy = async (form, task) => {
+      const button = form.querySelector('button[type="submit"]');
+      if (button) button.disabled = true;
+      try { await task(); } catch (error) { report(error.message || 'Please try again.', true); }
+      finally { if (button) button.disabled = false; }
+    };
+    requestForm.addEventListener('submit', event => {
+      event.preventDefault();
+      withBusy(requestForm, async () => {
+        targetEmail = emailField.value.trim().toLowerCase();
+        resetToken = null;
+        const result = await apiRequest('/auth/password-reset/request', {
+          method: 'POST', body: JSON.stringify({ email: targetEmail })
+        });
+        report(result.message || 'Check your email for the reset code.');
+        requestForm.hidden = true;
+        passwordStep.hidden = true;
+        otpStep.hidden = false;
+        document.getElementById('reset-otp').focus();
+      });
+    });
+    verifyForm?.addEventListener('submit', event => {
+      event.preventDefault();
+      withBusy(verifyForm, async () => {
+        const otp = document.getElementById('reset-otp').value.trim();
+        const result = await apiRequest('/auth/password-reset/verify', {
+          method: 'POST', body: JSON.stringify({ email: targetEmail, otp })
+        });
+        resetToken = result.reset_token;
+        otpStep.hidden = true;
+        passwordStep.hidden = false;
+        report('OTP verified. Enter and confirm a new password.');
+        document.getElementById('reset-new-password').focus();
+      });
+    });
+    completeForm?.addEventListener('submit', event => {
+      event.preventDefault();
+      withBusy(completeForm, async () => {
+        const password = document.getElementById('reset-new-password').value;
+        const confirm_password = document.getElementById('reset-confirm-password').value;
+        if (password !== confirm_password) throw new Error('Passwords do not match.');
+        await apiRequest('/auth/password-reset/complete', {
+          method: 'POST', body: JSON.stringify({ email: targetEmail, reset_token: resetToken, password, confirm_password })
+        });
+        resetToken = null;
+        verifyForm.reset(); completeForm.reset(); requestForm.reset();
+        otpStep.hidden = true; passwordStep.hidden = true; requestForm.hidden = false;
+        report('Password updated successfully. Sign in with your new password.');
+        location.hash = '#login';
+        const loginEmail = document.getElementById('login-email');
+        if (loginEmail) loginEmail.value = targetEmail;
+        showToast('Password changed. Please sign in.');
+      });
+    });
+    document.getElementById('reset-resend')?.addEventListener('click', async event => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      try {
+        const result = await apiRequest('/auth/password-reset/request', {
+          method: 'POST', body: JSON.stringify({ email: targetEmail })
+        });
+        report(result.message || 'Check your inbox.');
+        verifyForm?.reset();
+      } catch (error) { report(error.message, true); }
+      finally { button.disabled = false; }
+    });
+  }
+
   function initLogin() {
     const form = document.getElementById('login-form'), email = document.getElementById('login-email'), password = document.getElementById('login-password'), error = document.getElementById('login-error'), toggle = document.getElementById('toggle-password');
     const clearError = () => { if (error) { error.textContent = ''; error.style.display = 'none'; } };
@@ -1797,7 +1880,7 @@
     }
   }
   async function boot() {
-    initRegistration(); initLogin();
+    initRegistration(); initLogin(); initPasswordRecovery();
     loadState(); prepareMenuSections();
     try { await syncMenuSchedule(); } catch (error) { console.warn('Menu schedule unavailable during startup:', error); }
     initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
@@ -1813,7 +1896,7 @@
     if (currentSession()?.role === 'customer') await refreshReservationsWithNotice();
     if (currentSession()?.role === 'staff') { await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToast(`Staff tables: ${err.message}`)); }
     if (currentSession()?.role === 'kitchen') await syncKitchenFromBackend();
-    if (!currentSession()) location.hash = '#login';
+    if (!currentSession() && !PUBLIC_SCREENS.has(screenId())) location.hash = '#login';
     else if (!location.hash || location.hash === '#login') location.hash = roleHome(currentSession().role);
     handleRoute();
   }

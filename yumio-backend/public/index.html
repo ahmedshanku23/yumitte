@@ -338,19 +338,54 @@
                                                         </p>
                                                 </div>
                                         </div>
-                                        <div class="screen-note">Password recovery is not connected in this version.
-                                        </div>
-                                        <form action="#reset-sent" class="auth-form">
+                                        <p class="muted" id="reset-request-help">Enter your registered email to receive
+                                                a six-digit one-time password.</p>
+                                        <form id="password-reset-request-form" class="auth-form">
                                                 <div class="field">
-                                                        <label>
-                                                                Email
-                                                        </label>
-                                                        <input placeholder="you@example.com" type="email" />
+                                                        <label for="reset-email">Email</label>
+                                                        <input id="reset-email" name="email" type="email"
+                                                                autocomplete="email" placeholder="you@example.com"
+                                                                maxlength="254" required />
                                                 </div>
-                                                <button class="btn btn-dark btn-block" type="submit">
-                                                        Send Reset Request
-                                                </button>
+                                                <button class="btn btn-dark btn-block" type="submit">Send OTP</button>
                                         </form>
+                                        <div id="reset-otp-step" hidden>
+                                                <p class="reset-instruction">We have sent a mail to your email. Please
+                                                        enter the OTP to reset password.</p>
+                                                <form id="password-reset-verify-form" class="auth-form">
+                                                        <div class="field">
+                                                                <label for="reset-otp">6-digit OTP</label>
+                                                                <input id="reset-otp" type="text" inputmode="numeric"
+                                                                        autocomplete="one-time-code" pattern="[0-9]{6}"
+                                                                        minlength="6" maxlength="6" required
+                                                                        placeholder="000000" />
+                                                        </div>
+                                                        <button class="btn btn-dark btn-block" type="submit">Verify
+                                                                OTP</button>
+                                                </form>
+                                                <button id="reset-resend" class="linkbtn reset-resend"
+                                                        type="button">Resend OTP</button>
+                                        </div>
+                                        <div id="reset-new-password-step" hidden>
+                                                <p class="reset-instruction">OTP verified. Enter your new password.</p>
+                                                <form id="password-reset-complete-form" class="auth-form">
+                                                        <div class="field"><label for="reset-new-password">New
+                                                                        password</label>
+                                                                <input id="reset-new-password" type="password"
+                                                                        autocomplete="new-password" minlength="8"
+                                                                        required />
+                                                        </div>
+                                                        <div class="field"><label for="reset-confirm-password">Confirm
+                                                                        password</label>
+                                                                <input id="reset-confirm-password" type="password"
+                                                                        autocomplete="new-password" minlength="8"
+                                                                        required />
+                                                        </div>
+                                                        <button class="btn btn-dark btn-block" type="submit">Reset
+                                                                Password</button>
+                                                </form>
+                                        </div>
+                                        <p id="reset-feedback" role="status" aria-live="polite"></p>
                                         <div class="auth-link-row">
                                                 <a class="linkbtn" href="#login">
                                                         Back to sign in
