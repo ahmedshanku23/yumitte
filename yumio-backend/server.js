@@ -11,9 +11,13 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const kitchenRoutes = require('./routes/kitchenRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const receiptRoutes = require('./routes/receiptRoutes');
 const staffTablesRoutes = require('./routes/staffTablesRoutes');
+const serviceRequestRoutes = require('./routes/serviceRequestRoutes');
 
 const { startNotificationWorker } = require('./services/emailNotifications');
+
+const adminOverviewRoutes = require('./routes/adminOverviewRoutes');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -65,19 +69,22 @@ app.get('/api/health', async (req, res) => {
 // API routes
 app.use('/api/menu', menuRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminOverviewRoutes);
 app.use('/api/test', protectedRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/kitchen', kitchenRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/receipts', receiptRoutes);
 app.use(
   express.static(
     require('node:path').join(__dirname, 'public')
   )
 );
 app.use('/api/staff', staffTablesRoutes);
+app.use('/api/service-requests', serviceRequestRoutes);
 
-// Start server only once
+
 const server = app.listen(PORT, '127.0.0.1', () => {
   console.log(`Yumio API running on http://localhost:${PORT}`);
   startNotificationWorker();

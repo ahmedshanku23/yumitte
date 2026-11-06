@@ -3,12 +3,12 @@ const pool = require('../config/db');
 const { requireRole } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// Staff only: live table state, with most recent active reservation and balance.
+
 router.get('/tables', requireRole('staff', 'admin'), async (_req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT t.table_id, t.table_number, t.capacity, t.status,
-             r.reservation_id, r.status AS reservation_status,
+      SELECT t.table_id, t.table_number, t.status,
+             r.reservation_id, r.status AS reservation_status, r.guest_count AS current_guests,
              CASE WHEN r.reservation_id IS NULL THEN NULL ELSE
                COALESCE((SELECT SUM(o.total_amount) FROM orders o
                  WHERE o.reservation_id = r.reservation_id AND o.status <> 'cancelled'),0)

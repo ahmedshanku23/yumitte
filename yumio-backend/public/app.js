@@ -6,7 +6,6 @@
   const CART_KEY = 'yumioCartV7';
   const RESERVATION_DRAFT_KEY = 'yumioReservationDraftV1';
 
-  // Real authentication is provided by the backend, not browser-stored credentials.
   const API_BASE = '/api';
   async function apiRequest(path, options = {}) {
     let response;
@@ -199,8 +198,6 @@
       "available": true
     }
   ];
-  // Step 15.2: the menu is read from MySQL, not from the browser seed.
-  // Keep the existing view model so the HTML and CSS remain unchanged.
   async function syncMenuFromBackend() {
     try {
       const result = await apiRequest('/menu');
@@ -237,8 +234,6 @@
       existing.menu = menu;
       saveState(existing);
 
-      // Reprice draft cart rows against the current MySQL menu.
-      // The server will independently calculate authoritative totals at checkout.
       const currentMenu = new Map(menu.filter(x => x.available).map(x => [x.id, x]));
       const updatedCart = loadCart().flatMap(row => {
         const item = currentMenu.get(row.id);
@@ -247,13 +242,12 @@
       saveCart(updatedCart);
       return true;
     } catch (error) {
-      // Fail closed instead of displaying or selling stale local prices.
       const state = loadState();
       state.menu = [];
       saveState(state);
       saveCart([]);
       console.error('Yumio menu sync:', error);
-      showToast(`Menu unavailable: ${error.message}`);
+      showToastError(`Menu unavailable: ${error.message}`);
       return false;
     }
   }
@@ -293,9 +287,22 @@
   function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
   function roleHome(role) { return { customer: '#customer-home', admin: '#manager-dashboard', kitchen: '#kitchen-dashboard', staff: '#staff-dashboard' }[role] || '#login'; }
 
-  function showToast(message) {
-    const toast = document.getElementById('yumio-toast'); if (!toast) return;
-    toast.textContent = message; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('yumio-toast');
+    if (!toast) return;
+    if (type !== 'error' && currentSession()?.role !== 'admin') {
+      clearTimeout(toastTimer);
+      toast.classList.remove('show');
+      return;
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function showToastError(message) {
+    showToast(message, 'error');
   }
 
   function allowedForRole(id, role) {
@@ -310,7 +317,7 @@
     const id = screenId(); if (PUBLIC_SCREENS.has(id)) return true;
     const session = currentSession();
     if (!session) { if (location.hash !== '#login') location.hash = '#login'; return false; }
-    if (!allowedForRole(id, session.role)) { showToast('That page is not available for this user role.'); location.hash = roleHome(session.role); return false; }
+    if (!allowedForRole(id, session.role)) { showToastError('That page is not available for this user role.'); location.hash = roleHome(session.role); return false; }
     return true;
   }
 
@@ -452,8 +459,9 @@
         setSession({ id: user.id ?? user.user_id, email: user.email || mail, role: user.role, name: user.name || user.full_name || mail });
         form.reset(); password.type = 'password'; if (toggle) toggle.textContent = 'SHOW';
         if (user.role === 'customer') await refreshReservationsWithNotice();
-        if (user.role === 'staff') { await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToast(`Staff tables: ${err.message}`)); }
+        if (user.role === 'staff') { await refreshServiceRequests(); await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToastError(`Staff tables: ${err.message}`)); }
         if (user.role === 'kitchen') await syncKitchenFromBackend();
+        if (user.role === 'admin') await refreshManagerOverview(true);
         location.hash = roleHome(user.role);
         renderAll();
       } catch (err) { showError(err.message || 'Unable to sign in'); }
@@ -470,14 +478,12 @@
     });
   }
 
-  // Step 15.3: MySQL is the authoritative reservation source.
   const reservationStatusLabel = value => ({
     pending: 'Pending', confirmed: 'Confirmed', checked_in: 'Checked In',
     dining_done: 'Dining Complete', completed: 'Completed', cancelled: 'Cancelled'
   })[value] || value;
   const localDateString = value => {
     if (!value) return '';
-    // MySQL DATE may serialize as ISO timestamp; preserve calendar date.
     return String(value).slice(0, 10);
   };
   const normalizeReservation = row => ({
@@ -488,7 +494,7 @@
     date: localDateString(row.reservation_date),
     time: String(row.reservation_time || '').slice(0, 5),
     guests: Number(row.guest_count),
-    tableId: String(row.table_number).padStart(2, '0'),
+    tableId: row.table_number == null ? null : String(row.table_number).padStart(2, '0'),
     request: row.special_requests || '',
     status: reservationStatusLabel(row.status),
     fromBackend: true
@@ -500,8 +506,6 @@
     if (!Array.isArray(result.data)) throw new Error('Unexpected reservation API response');
     const s = loadState();
     s.reservations = result.data.map(normalizeReservation);
-    // Reconcile cached orders against the server's authoritative reservation status.
-    // The cancellation endpoint atomically cancels any associated pre-orders.
     const cancelledIds = new Set(s.reservations.filter(r => r.status === 'Cancelled').map(r => r.id));
     for (const order of s.orders) {
       if (order.fromBackend && cancelledIds.has(String(order.reservationId))) {
@@ -511,7 +515,6 @@
     }
     const selectedOrder = s.orders.find(o => o.id === s.selectedOrderId);
     if (selectedOrder && selectedOrder.status === 'Cancelled') s.selectedOrderId = null;
-    // Never let stale prototype state masquerade as database table occupancy.
     s.customerTableId = null;
     s.tables.forEach(t => { t.status = 'Available'; t.reservationId = null; t.customerEmail = null; });
     const active = s.reservations.find(r => r.status === 'Checked In');
@@ -526,7 +529,7 @@
   }
   async function refreshReservationsWithNotice() {
     try { await syncCustomerReservations(); }
-    catch (err) { showToast(`Reservations not refreshed: ${err.message}`); }
+    catch (err) { showToastError(`Reservations not refreshed: ${err.message}`); }
   }
   function to24Hour(time) {
     const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(time || '');
@@ -575,36 +578,7 @@
     return `${hour}:${minute} ${period}`;
   }
 
-  function updateReservationTableOptions() {
-    const select = document.getElementById('reservation-table');
-    if (!select) return;
-
-    const date = document.getElementById('reservation-date')?.value || '';
-    const guests = Number(document.getElementById('reservation-guests')?.value || 0);
-    const time = getPreferredReservationTime();
-    const current = select.value;
-
-    if (!date || !guests || !time) {
-      select.disabled = true;
-      select.innerHTML = '<option value="">Choose date, guests and preferred time first</option>';
-      return;
-    }
-
-    const tables = loadState().tables; // Show every table, regardless of guest count.
-    // Availability is finally validated by MySQL on submission.
-    select.disabled = false;
-
-    if (!tables.length) {
-      select.innerHTML = '<option value="">No tables available for this time</option>';
-      return;
-    }
-
-    select.innerHTML = '<option value="">Select a table</option>' + tables.map(t =>
-      `<option value="${esc(t.id)}">Table ${esc(t.id)}</option>`
-    ).join('');
-
-    if (tables.some(t => t.id === current)) select.value = current;
-  }
+  function updateReservationTableOptions() { }
 
   function initReservation() {
     ['reservation-date', 'reservation-guests', 'reservation-hour', 'reservation-minute', 'reservation-period'].forEach(id => {
@@ -616,26 +590,13 @@
       const date = document.getElementById('reservation-date')?.value;
       const guests = Number(document.getElementById('reservation-guests')?.value || 0);
       const time = getPreferredReservationTime();
-      const tableId = document.getElementById('reservation-table')?.value || '';
       const request = document.getElementById('reservation-request')?.value.trim() || '';
 
-      if (!date || !guests || !time) return showToast('Please select a date, number of guests and time.');
+      if (!date || !guests || !time) return showToastError('Please select a date, number of guests and time.');
       const today = new Date(); today.setHours(0, 0, 0, 0);
-      if (new Date(`${date}T00:00:00`) < today) return showToast('Please choose today or a future date.');
-      if (!tableId) return showToast('Please choose an available table.');
-
-      const state = loadState();
-      const selected = state.tables.find(t => t.id === tableId);
-      if (!selected) {
-        updateReservationTableOptions();
-        return showToast('That table is no longer available for the selected time. Please choose another table.');
-      }
-
-      if (guests > selected.capacity) {
-        showToast(`Table ${selected.id} has ${selected.capacity} seats for ${guests} guests. Staff may need to arrange extra seating.`);
-      }
-
-      localStorage.setItem(RESERVATION_DRAFT_KEY, JSON.stringify({ date, guests, time, tableId, request }));
+      if (new Date(`${date}T00:00:00`) < today) return showToastError('Please choose today or a future date.');
+      if (!Number.isSafeInteger(guests) || guests < 1 || guests > 40) return showToastError('Choose between 1 and 40 guests.');
+      localStorage.setItem(RESERVATION_DRAFT_KEY, JSON.stringify({ date, guests, time, request }));
       renderReservationDetails();
       location.hash = '#reservation-details';
     });
@@ -645,8 +606,6 @@
       if (b) { e.preventDefault(); confirmReservation(); }
     });
 
-    // Cancellation is deliberately disabled until an authenticated backend
-    // cancellation endpoint exists. No browser-only changes to reservations.
   }
 
   function renderReservationDetails() {
@@ -669,7 +628,7 @@
       <div class="dynamic-row"><strong>Date</strong><span>${esc(formatDate(draft.date))}</span></div>
       <div class="dynamic-row"><strong>Guests</strong><span>${draft.guests}</span></div>
       <div class="dynamic-row"><strong>Time</strong><span>${esc(draft.time)}</span></div>
-      <div class="dynamic-row"><strong>Table</strong><span>Table ${esc(draft.tableId)}</span></div>
+      <div class="dynamic-row"><strong>Table</strong><span>Assigned by staff after approval</span></div>
       <div class="dynamic-row"><strong>Special request</strong><span>${esc(draft.request || 'None')}</span></div>
     </div>`;
     actions.innerHTML = '<a class="btn btn-secondary" href="#reserve">Back to Reservation</a><a class="btn btn-dark" href="#reservation-confirmation" data-action="confirm-reservation">Confirm Reservation</a>';
@@ -678,12 +637,11 @@
   function confirmReservation() {
     if (confirmReservation.inFlight) return;
     const draft = reservationDraft();
-    if (!draft) return showToast('Complete the reservation form first.');
+    if (!draft) return showToastError('Complete the reservation form first.');
     confirmReservation.inFlight = true;
     (async () => {
       try {
         const payload = {
-          table_id: Number(draft.tableId),
           reservation_date: draft.date,
           reservation_time: to24Hour(draft.time),
           guest_count: Number(draft.guests),
@@ -701,9 +659,7 @@
         location.hash = '#reservation-confirmation';
         showToast('Reservation sent to staff for approval.');
       } catch (err) {
-        showToast(`Reservation not confirmed: ${err.message}`);
-        // Preserve draft for retry. If request succeeded but refresh failed,
-        // verify My Reservations before submitting again.
+        showToastError(`Reservation not confirmed: ${err.message}`);
       } finally { confirmReservation.inFlight = false; }
     })();
   }
@@ -718,7 +674,7 @@
     if (!empty || !actions) return;
 
     empty.innerHTML = r
-      ? `<strong>${esc(r.id)}</strong><br>${esc(formatDate(r.date))} at ${esc(displayTime24h(r.time))} · ${r.guests} guest${r.guests === 1 ? '' : 's'}<br>Reserved table: <strong>Table ${esc(r.tableId)}</strong><br>Status: <strong>${esc(r.status)}</strong><br><span class="meta">Staff confirms the reservation. When it is confirmed and you arrive, you can check in directly from your customer account.</span>`
+      ? `<strong>${esc(r.id)}</strong><br>${esc(formatDate(r.date))} at ${esc(displayTime24h(r.time))} · ${r.guests} guest${r.guests === 1 ? '' : 's'}<br>Table: <strong>${r.tableId ? `Table ${esc(r.tableId)}` : 'Awaiting staff allocation'}</strong><br>Status: <strong>${esc(r.status)}</strong><br><span class="meta">Staff confirms the reservation. When it is confirmed and you arrive, you can check in directly from your customer account.</span>`
       : 'No reservation has been created yet.';
 
     actions.innerHTML = '<a class="btn btn-dark" href="#customer-home">Back Home</a><a class="btn btn-secondary" href="#reserve">Reservations</a>' +
@@ -734,14 +690,14 @@
       location.hash = '#table-connected';
       showToast(`Check-in successful. ${result.preorders_released || 0} pre-orders released to kitchen.`);
     } catch (err) {
-      showToast(`Check-in failed: ${err.message}`);
+      showToastError(`Check-in failed: ${err.message}`);
     } finally { customerCheckIn.inFlight = false; }
   }
 
   async function markCustomerDiningDone() {
     const s = loadState();
     const active = s.reservations.find(r => r.status === 'Checked In' && r.customerEmail === currentSession()?.email);
-    if (!active) return showToast('Check in to your confirmed reservation first.');
+    if (!active) return showToastError('Check in to your confirmed reservation first.');
     try {
       await apiRequest(`/reservations/${encodeURIComponent(active.id)}/dining-done`, { method: 'PATCH' });
       await syncCustomerReservations();
@@ -749,8 +705,8 @@
       finalBill = null;
       finalBillReservationId = null;
       location.hash = '#payment';
-      try { await refreshFinalBill(); } catch (error) { showToast(`Final bill unavailable: ${error.message}`); }
-    } catch (err) { showToast(err.message); }
+      try { await refreshFinalBill(); } catch (error) { showToastError(`Final bill unavailable: ${error.message}`); }
+    } catch (err) { showToastError(err.message); }
   }
 
   function renderCustomerReservations() {
@@ -764,14 +720,14 @@
     let html = `<div class="section-head">
       <h2>Your Reservations</h2>
       <a class="btn btn-primary" href="#reserve">New Reservation</a>
-    </div>`;
+    </div><div class="notice yumio-cancellation-notice"><div><strong>Cancellation policy</strong><p>Cancel at least 1 hour before your reservation for a full eligible refund. Cancelling less than 1 hour before the booked time incurs a MVR 25 cancellation fee, deducted from any eligible refund.</p></div></div>`;
 
     if (draft) {
       html += `<div class="card reservation-draft-card">
         <div class="section-head">
           <div>
             <strong>Reservation not submitted yet</strong>
-            <div class="meta">${esc(formatDate(draft.date))} at ${esc(draft.time)} · ${draft.guests} guest${draft.guests === 1 ? '' : 's'} · Table ${esc(draft.tableId)}</div>
+            <div class="meta">${esc(formatDate(draft.date))} at ${esc(draft.time)} · ${draft.guests} guest${draft.guests === 1 ? '' : 's'} · Table assigned by staff</div>
           </div>
           <span class="status">Draft</span>
         </div>
@@ -824,7 +780,7 @@
           <div class="section-head">
             <div>
               <strong>${esc(r.id)} · ${esc(formatDate(r.date))} at ${esc(displayTime24h(r.time))}</strong>
-              <div class="meta">${r.guests} guest${r.guests === 1 ? '' : 's'} · Table ${esc(r.tableId)}</div>
+              <div class="meta">${r.guests} guest${r.guests === 1 ? '' : 's'} · ${r.tableId ? `Table ${esc(r.tableId)}` : 'Awaiting table allocation'}</div>
             </div>
             <span class="status">${esc(r.status)}</span>
           </div>
@@ -884,7 +840,7 @@
               const result = await apiRequest(`/reservations/${encodeURIComponent(id)}/cancel`, { method: 'PATCH', body: JSON.stringify({ confirm: true }) });
               await syncCustomerReservations();
               showToast(result.message || 'Reservation cancelled.');
-            } catch (err) { showToast(`Cancellation failed: ${err.message}`); }
+            } catch (err) { showToastError(`Cancellation failed: ${err.message}`); }
           })();
           return;
         }
@@ -895,7 +851,7 @@
   function initTables() {
     document.getElementById('connect-table-form')?.addEventListener('submit', e => {
       e.preventDefault();
-      showToast('Please check in using a confirmed MySQL reservation.');
+      showToastError('Please check in using a confirmed MySQL reservation.');
       location.hash = '#my-reservations';
     });
 
@@ -985,6 +941,19 @@
     if (begin === null || stop === null) return false;
     return begin < stop ? minutes >= begin && minutes < stop : minutes >= begin || minutes < stop;
   }
+  function servingTimeLabel(value) {
+    const minutes = timeMinutes(value);
+    if (minutes === null) return 'scheduled hours';
+    const hours = Math.floor(minutes / 60), minute = minutes % 60;
+    return `${hours % 12 || 12}:${String(minute).padStart(2, '0')} ${hours < 12 ? 'AM' : 'PM'}`;
+  }
+  function unavailableCategoryMessage(category) {
+    const schedule = menuSchedule.find(row => row.category === category);
+    if (!schedule) return `${category} serving hours are temporarily unavailable.`;
+    if (!schedule.is_active) return `${category} menu is currently unavailable.`;
+    if (schedule.is_all_day) return `${category} menu is available during restaurant opening hours.`;
+    return `${category} menu is only available from ${servingTimeLabel(schedule.start_time)} to ${servingTimeLabel(schedule.end_time)}.`;
+  }
   function selectedMenuMinutes() {
     const preId = sessionStorage.getItem('yumioPreorderReservationSelectionV1');
     const state = loadState();
@@ -992,7 +961,6 @@
     return r ? timeMinutes(r.time) : maleMinutes();
   }
   function prepareMenuSections() {
-    // Repurpose existing menu screens without changing their existing CSS or role guards.
     const mapping = { 'menu-startar': 'menu-lunch', 'menu-main-course': 'menu-supper', 'menu-desserts': 'menu-dinner' };
     const originalDessert = document.getElementById('menu-desserts');
     const cloneSource = originalDessert?.cloneNode(true);
@@ -1000,7 +968,6 @@
     const parent = document.getElementById('menu-dinner')?.parentElement;
     if (parent && cloneSource) for (const [id, cat] of [['menu-drinks', 'Drinks'], ['menu-desserts', 'Desserts']]) { const clone = cloneSource.cloneNode(true); clone.id = id; clone.setAttribute('aria-label', cat + ' Menu · Yumio'); parent.appendChild(clone); }
     document.querySelectorAll('a[href]').forEach(a => { const old = a.getAttribute('href'); if (mapping[old?.slice(1)]) a.setAttribute('href', '#' + mapping[old.slice(1)]); });
-    // All menu tabs are regenerated on each screen for consistent six-category navigation.
     Object.entries(MENU_SCREENS).forEach(([id, cat]) => {
       const sec = document.getElementById(id); if (!sec) return;
       sec.setAttribute('aria-label', cat + ' Menu · Yumio');
@@ -1010,11 +977,11 @@
   }
   async function syncMenuSchedule() {
     try { const data = await apiRequest('/menu/schedules'); if (!Array.isArray(data.data)) throw Error('Invalid menu schedules'); menuSchedule = data.data; }
-    catch (err) { menuSchedule = []; console.error('Menu schedule unavailable', err); showToast('Menu availability cannot be verified.'); }
+    catch (err) { menuSchedule = []; console.error('Menu schedule unavailable', err); showToastError('Menu availability cannot be verified.'); }
   }
   function adjustCartItem(id, delta) {
     const s = loadState(), item = s.menu.find(x => x.id === id);
-    if (!item || !item.available || !categoryAllowed(item.category, selectedMenuMinutes())) return showToast('This dish is not currently available.');
+    if (!item || !item.available || !categoryAllowed(item.category, selectedMenuMinutes())) return showToastError('This dish is not currently available.');
     const cart = loadCart(); let entry = cart.find(x => x.id === id && !x.notes);
     if (!entry && delta > 0) { entry = { id, name: item.name, price: item.price, quantity: 0, notes: '' }; cart.push(entry); }
     if (!entry) return;
@@ -1033,7 +1000,7 @@
       const allowed = categoryAllowed(category, minutes);
       sec.querySelectorAll('.menu-chip').forEach(chip => { const target = chip.getAttribute('href')?.slice(1); chip.classList.toggle('active', target === screen); const c = MENU_SCREENS[target]; chip.classList.toggle('menu-unavailable', !!c && !categoryAllowed(c, minutes)); });
       const items = s.menu.filter(x => x.category === category && x.available);
-      if (!allowed) { grid.innerHTML = '<div class="empty">This menu is not available for the selected serving time. Choose the current meal, Drinks or Desserts.</div>'; return; }
+      if (!allowed) { grid.innerHTML = `<div class="empty">${esc(unavailableCategoryMessage(category))}</div>`; return; }
       grid.innerHTML = items.length ? items.map(item => {
         const amount = loadCart().filter(c => c.id === item.id).reduce((n, c) => n + c.quantity, 0);
         const image = item.image && item.image.startsWith('/images/menu/') ? item.image : '';
@@ -1059,19 +1026,17 @@
   });
   function initCart() {
     document.addEventListener('click', e => {
-      const add = e.target.closest('[data-action="add-to-cart"]'); if (add) { e.preventDefault(); const s = loadState(), item = s.menu.find(x => x.id === add.dataset.id), sec = add.closest('.prototype-screen'), qty = Number(sec?.querySelector('select')?.value || 1), notes = sec?.querySelector('textarea')?.value.trim() || ''; if (!item || item.price == null || !item.available || !categoryAllowed(item.category, selectedMenuMinutes())) return showToast('This item is not available at this serving time.'); const cart = loadCart(), existing = cart.find(x => x.id === item.id && x.notes === notes); if (existing) existing.quantity += qty; else cart.push({ id: item.id, name: item.name, price: item.price, quantity: qty, notes }); saveCart(cart); renderCart(); renderMenuScreens(); updateCartSummary(); renderFloatingCart(); showToast(`${item.name} added to cart.`); location.hash = '#cart'; return; }
+      const add = e.target.closest('[data-action="add-to-cart"]'); if (add) { e.preventDefault(); const s = loadState(), item = s.menu.find(x => x.id === add.dataset.id), sec = add.closest('.prototype-screen'), qty = Number(sec?.querySelector('select')?.value || 1), notes = sec?.querySelector('textarea')?.value.trim() || ''; if (!item || item.price == null || !item.available || !categoryAllowed(item.category, selectedMenuMinutes())) return showToastError('This item is not available at this serving time.'); const cart = loadCart(), existing = cart.find(x => x.id === item.id && x.notes === notes); if (existing) existing.quantity += qty; else cart.push({ id: item.id, name: item.name, price: item.price, quantity: qty, notes }); saveCart(cart); renderCart(); renderMenuScreens(); updateCartSummary(); renderFloatingCart(); showToast(`${item.name} added to cart.`); location.hash = '#cart'; return; }
       const c = e.target.closest('[data-cart-action]'); if (c) { const cart = loadCart(), i = Number(c.dataset.index); if (!cart[i]) return; if (c.dataset.cartAction === 'plus') cart[i].quantity++; if (c.dataset.cartAction === 'minus') cart[i].quantity = Math.max(1, cart[i].quantity - 1); if (c.dataset.cartAction === 'remove') cart.splice(i, 1); saveCart(cart); renderCart(); renderMenuScreens(); updateCartSummary(); renderFloatingCart(); return; }
       if (e.target.closest('[data-action="place-order"]')) { e.preventDefault(); placeOrder(); }
       if (e.target.closest('[data-action="place-preorder"]')) { e.preventDefault(); placePreorder(); }
     });
   }
   function updateCartSummary() { const cart = loadCart(), count = cart.reduce((a, x) => a + Number(x.quantity || 0), 0), total = cart.reduce((a, x) => a + Number(x.price || 0) * Number(x.quantity || 0), 0); Object.keys(MENU_SCREENS).forEach(id => { const l = document.getElementById(id)?.querySelector('a[href="#cart"].btn-primary'); if (l) l.textContent = `View Cart · ${count} item${count === 1 ? '' : 's'} · ${money(total)}`; }); }
-  // Only show the checkout action permitted by the customer's reservation state.
   function activeCheckoutMode() {
     const customer = currentSession();
     if (!customer || customer.role !== 'customer') return null;
     const reservations = loadState().reservations.filter(r => r.customerEmail === customer.email);
-    // Checked-in dining takes priority over any other pending/confirmed bookings.
     if (reservations.some(r => r.status === 'Checked In')) return 'regular';
     if (reservations.some(r => r.status === 'Confirmed')) return 'preorder';
     return null;
@@ -1102,7 +1067,6 @@
     const region = document.getElementById('yumio-cart-announcement');
     if (region) region.textContent = message;
   }
-  // Floating cart: uses the same localStorage cart as the existing checkout.
   function initFloatingCart() {
     const container = document.createElement('div');
     container.id = 'yumio-cart-overlay';
@@ -1130,7 +1094,6 @@
       const updated = loadCart();
       const portions = updated.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
       cartAnnouncement(`Cart updated. ${portions} portions. Subtotal ${money(updated.reduce((sum, row) => sum + Number(row.price || 0) * Number(row.quantity || 0), 0))}.`);
-      // Rendering replaces buttons. Put focus on the same quantity action, or the close button if removed.
       const next = container.querySelector(`[data-drawer-action="${control.dataset.drawerAction}"][data-index="${index}"]`);
       (next && !next.disabled ? next : container.querySelector('#yumio-cart-close'))?.focus({ preventScroll: true });
     });
@@ -1184,21 +1147,19 @@
     overlay.querySelector('#yumio-cart-continue').onclick = () => toggleFloatingCart(false);
     overlay.querySelector('#yumio-cart-to-checkout').onclick = () => toggleFloatingCart(false);
   }
-  // Step 15.4a — regular orders are saved by the backend after check-in.
-  // Pre-orders will be wired separately to the deposit confirmation screen.
   let orderSubmissionInProgress = false;
   async function placeOrder() {
     if (orderSubmissionInProgress) return;
     const cart = loadCart();
-    if (!cart.length) return showToast('Your cart is empty.');
-    if (currentSession()?.role !== 'customer') return showToast('Please sign in as a customer.');
+    if (!cart.length) return showToastError('Your cart is empty.');
+    if (currentSession()?.role !== 'customer') return showToastError('Please sign in as a customer.');
 
     const state = loadState();
     const reservation = [...state.reservations].reverse().find(r =>
       r.customerEmail === currentSession()?.email && r.status === 'Checked In'
     );
     if (!reservation) {
-      showToast('Check in to a confirmed reservation before placing a regular order.');
+      showToastError('Check in to a confirmed reservation before placing a regular order.');
       location.hash = '#my-reservations';
       return;
     }
@@ -1209,9 +1170,8 @@
     }));
     if (items.some(row => !Number.isSafeInteger(row.item_id) || row.item_id <= 0 ||
       !Number.isSafeInteger(row.quantity) || row.quantity <= 0 || row.quantity > 50)) {
-      return showToast('Invalid cart item or quantity.');
+      return showToastError('Invalid cart item or quantity.');
     }
-    // Keep the same key for a retried request with the same cart/reservation.
     const signature = JSON.stringify({ reservation_id: Number(reservation.id), items });
     const storageKey = 'yumioPendingRegularOrderV1';
     let pending;
@@ -1261,13 +1221,12 @@
       location.hash = '#order-confirmation';
       showToast('Regular order saved in MySQL.');
     } catch (err) {
-      showToast(`Order not confirmed: ${err.message}. Retry using the same cart.`);
+      showToastError(`Order not confirmed: ${err.message}. Retry using the same cart.`);
     } finally {
       orderSubmissionInProgress = false;
       if (button) button.disabled = false;
     }
   }
-  // Choose the reservation explicitly, rather than silently using the newest.
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-select-preorder]');
     if (!button) return;
@@ -1276,19 +1235,17 @@
     const state = loadState();
     const eligible = state.reservations.find(r => r.id === reservationId &&
       r.customerEmail === currentSession()?.email && r.status === 'Confirmed');
-    if (!eligible) return showToast('Only confirmed reservations can be pre-ordered.');
-    // Pre-orders are displayed according to the reservation's serving time,
-    // not the time at which the customer happens to be browsing.
+    if (!eligible) return showToastError('Only confirmed reservations can be pre-ordered.');
     const reservationMinutes = timeMinutes(eligible.time);
     if (reservationMinutes === null) {
-      showToast('The reservation time could not be read. Please refresh your reservations.');
+      showToastError('The reservation time could not be read. Please refresh your reservations.');
       return;
     }
     const meal = ['Breakfast', 'Lunch', 'Supper', 'Dinner'].find(category =>
       categoryAllowed(category, reservationMinutes)
     );
     if (!meal) {
-      showToast('No meal menu is scheduled at your reservation time.');
+      showToastError('No meal menu is scheduled at your reservation time.');
       return;
     }
     sessionStorage.setItem('yumioPreorderReservationSelectionV1', reservationId);
@@ -1297,8 +1254,6 @@
     location.hash = `#${screen}`;
     showToast(`Pre-ordering ${meal} for Reservation ${reservationId} at ${displayTime24h(eligible.time)}.`);
   });
-  // Step 15.4B: pre-order creation and demo deposit confirmation.
-  // A pending checkout is retained within this browser tab for safe retries.
   const PREORDER_PENDING_KEY = 'yumioPendingPreorderV1';
   let preorderInProgress = false;
   function preorderDialog({ orderId, total, deposit, reservationId }) {
@@ -1334,7 +1289,6 @@
         });
         state.selectedOrderId = String(orderId);
         saveState(state);
-        // Avoid erasing an unrelated cart if the user changed it in another tab.
         if (pending && JSON.stringify(loadCart()) === JSON.stringify(pending.cart)) saveCart([]);
         sessionStorage.removeItem(PREORDER_PENDING_KEY);
         shade.remove(); renderAll(); location.hash = '#order-confirmation';
@@ -1349,20 +1303,20 @@
   async function placePreorder() {
     if (preorderInProgress) return;
     const cart = loadCart();
-    if (!cart.length) return showToast('Your cart is empty.');
-    if (currentSession()?.role !== 'customer') return showToast('Please sign in as a customer.');
+    if (!cart.length) return showToastError('Your cart is empty.');
+    if (currentSession()?.role !== 'customer') return showToastError('Please sign in as a customer.');
     const confirmed = loadState().reservations.filter(r =>
       r.customerEmail === currentSession()?.email && r.status === 'Confirmed');
     const preferredId = sessionStorage.getItem('yumioPreorderReservationSelectionV1');
     const reservation = confirmed.find(r => r.id === preferredId) ||
       (confirmed.length === 1 ? confirmed[0] : null);
     if (!reservation && confirmed.length > 1) {
-      showToast('Choose a confirmed reservation from My Reservations before pre-ordering.');
+      showToastError('Choose a confirmed reservation from My Reservations before pre-ordering.');
       location.hash = '#my-reservations'; return;
     }
-    if (!reservation) { showToast('You need a staff-confirmed reservation to pre-order before check-in.'); location.hash = '#my-reservations'; return; }
+    if (!reservation) { showToastError('You need a staff-confirmed reservation to pre-order before check-in.'); location.hash = '#my-reservations'; return; }
     const items = cart.map(row => ({ item_id: Number(String(row.id).replace(/^item-/, '')), quantity: Number(row.quantity) }));
-    if (items.some(x => !Number.isSafeInteger(x.item_id) || x.item_id < 1 || !Number.isSafeInteger(x.quantity) || x.quantity < 1 || x.quantity > 50)) return showToast('Invalid cart item or quantity.');
+    if (items.some(x => !Number.isSafeInteger(x.item_id) || x.item_id < 1 || !Number.isSafeInteger(x.quantity) || x.quantity < 1 || x.quantity > 50)) return showToastError('Invalid cart item or quantity.');
     const signature = JSON.stringify({ reservation_id: Number(reservation.id), items });
     let pending; try { pending = JSON.parse(sessionStorage.getItem(PREORDER_PENDING_KEY) || 'null'); } catch { pending = null; }
     if (!pending || pending.signature !== signature) { pending = { signature, key: crypto.randomUUID(), cart: structuredClone(cart), tableId: reservation.tableId }; sessionStorage.setItem(PREORDER_PENDING_KEY, JSON.stringify(pending)); }
@@ -1376,17 +1330,14 @@
       }
       const row = result.order || result;
       const orderId = Number(row.order_id), total = Number(row.total_amount), deposit = Number(row.deposit_due);
-      // A retry of the POST may return the existing order without payment totals.
       if (!Number.isSafeInteger(orderId) || orderId < 1) throw new Error('Backend did not return an order ID');
       if (!pending.orderId && (!Number.isFinite(total) || !Number.isFinite(deposit))) {
-        // Derive the expected display from the server-authoritative menu synced into the cart.
-        // Do not attempt to settle an unknown amount: ask to retry after resolving order details.
         throw new Error('Order was created but totals were not returned. Please contact support before retrying checkout.');
       }
       pending = { ...pending, orderId, total: pending.total ?? total, deposit: pending.deposit ?? deposit };
       sessionStorage.setItem(PREORDER_PENDING_KEY, JSON.stringify(pending));
       preorderDialog({ orderId, total: pending.total, deposit: pending.deposit, reservationId: reservation.id });
-    } catch (err) { showToast(`Pre-order pending: ${err.message}`); }
+    } catch (err) { showToastError(`Pre-order pending: ${err.message}`); }
     finally { preorderInProgress = false; if (button) button.disabled = false; }
   }
   function renderOrderConfirmation() { const s = loadState(), o = s.orders.find(x => x.id === s.selectedOrderId) || s.orders.at(-1), e = document.querySelector('#order-confirmation .empty'); if (e) e.innerHTML = o ? `<strong>${esc(o.id)} placed successfully.</strong><br>${o.reservationId ? `Reservation ${esc(o.reservationId)} · ` : ''}Table ${esc(o.tableId)} · ${money(o.total)}<br>Status: <strong>${esc(o.status)}</strong>${o.preorder ? '<br>40% demo deposit confirmed. Kitchen receives the order after check-in.' : ''}` : 'No order has been submitted yet.'; }
@@ -1419,10 +1370,41 @@
     target.innerHTML = `<div class="card"><div class="section-head"><div><strong>${esc(o.id)} · Table ${esc(o.tableId)}</strong><div class="meta">${money(o.total)}</div></div><span class="status">${esc(o.status)}</span></div><div class="dynamic-stack">${steps.map((step, i) => `<div class="dynamic-row"><span>${i <= current ? '●' : '○'} ${esc(step)}</span><span>${i === current ? 'Current' : i < current ? 'Done' : ''}</span></div>`).join('')}</div></div>`;
   }
 
-  function initServiceRequests() { document.querySelectorAll('#service-requests .grid-2 a.card').forEach(card => card.addEventListener('click', e => { e.preventDefault(); const s = loadState(); if (!s.customerTableId) { showToast('Check in or connect to a table before sending a service request.'); location.hash = '#reserve'; return; } const activeTable = s.tables.find(t => t.id === s.customerTableId); if (!activeTable || activeTable.status !== 'Occupied') return showToast('This dining session is no longer active.'); const title = card.querySelector('h3')?.textContent.trim().replace(/^\S+\s*/, '') || 'Other'; s.serviceRequests.push({ id: nextId('REQ', s.serviceRequests), customerEmail: currentSession()?.email || '', tableId: s.customerTableId, type: title, status: 'Pending', createdAt: nowLabel() }); saveState(s); renderAll(); location.hash = '#service-request-sent'; })); }
-  function renderServiceRequestSent() { const s = loadState(), r = s.serviceRequests.at(-1), e = document.querySelector('#service-request-sent .empty'); if (e) e.innerHTML = r ? `<strong>${esc(r.type)} request sent.</strong><br>Table ${esc(r.tableId)} · Status: ${esc(r.status)}` : 'No service request has been sent yet.'; }
+  let liveServiceRequests = [];
+  let lastServiceRequest = null;
+  const normalizeServiceRequest = row => ({
+    id: String(row.request_id),
+    tableId: String(row.table_number),
+    type: row.request_type,
+    status: row.status === 'pending' ? 'Pending' : 'Completed',
+    createdAt: String(row.created_at || ''),
+    customerName: row.customer_name || ''
+  });
+  async function refreshServiceRequests() {
+    if (!['staff', 'admin'].includes(currentSession()?.role)) return;
+    const response = await apiRequest('/service-requests');
+    liveServiceRequests = (response.data || []).map(normalizeServiceRequest);
+    renderStaffDashboard();
+    renderStaffRequests();
+  }
+  function initServiceRequests() {
+    document.querySelectorAll('#service-requests .grid-2 a.card').forEach(card => card.addEventListener('click', async e => {
+      e.preventDefault();
+      const title = card.querySelector('h3')?.textContent.trim().replace(/^\S+\s*/, '') || 'Other';
+      try {
+        const result = await apiRequest('/service-requests', { method: 'POST', body: JSON.stringify({ type: title }) });
+        lastServiceRequest = { id: result.request_id, type: title, status: 'Pending' };
+        renderServiceRequestSent();
+        location.hash = '#service-request-sent';
+      } catch (error) { showToastError(error.message); }
+    }));
+  }
+  function renderServiceRequestSent() {
+    const r = lastServiceRequest;
+    const e = document.querySelector('#service-request-sent .empty');
+    if (e) e.innerHTML = r ? `<strong>${esc(r.type)} request sent.</strong><br>Request ${esc(r.id)} · Status: ${esc(r.status)}` : 'No service request has been sent yet.';
+  }
 
-  // Step 15.6: use authoritative MySQL billing data for the selected dining session.
   const selectedDiningReservation = () => {
     const s = loadState();
     const mine = s.reservations.filter(r => r.customerEmail === currentSession()?.email);
@@ -1467,7 +1449,7 @@
         await refreshFinalBill();
         location.hash = '#payment-success';
         renderPaymentSuccess();
-      } catch (err) { showToast(`Final payment failed: ${err.message}`); button.disabled = false; }
+      } catch (err) { showToastError(`Final payment failed: ${err.message}`); button.disabled = false; }
     });
   }
   function renderPaymentSuccess() {
@@ -1477,13 +1459,11 @@
       ? `<strong>Demo payment recorded.</strong><br>Reservation ${esc(finalPaymentReceipt.reservation_id)} · ${money(finalPaymentReceipt.amount_paid || '0.00')}<br>Balance: MVR 0.00<br>Service Staff can now close the table.`
       : 'No final payment has been completed in this session.';
   }
-  // Restore dashboard metric navigation from the original Yumio frontend.
   let staffViewFilter = null;
   document.addEventListener('click', event => {
     const metric = event.target.closest('#staff-dashboard [data-staff-filter]');
     if (metric) {
       staffViewFilter = metric.dataset.staffFilter;
-      // Navigating to the same hash does not trigger hashchange.
       if (location.hash === metric.getAttribute('href')) renderAll();
       return;
     }
@@ -1494,34 +1474,74 @@
     }
   });
   function renderStaff() { renderStaffDashboard(); renderStaffReservations(); renderStaffCheckIn(); renderStaffTables(); renderStaffRequests(); }
-  function renderStaffDashboard() { const s = loadState(), sec = document.getElementById('staff-dashboard'); if (!sec) return; const m = sec.querySelectorAll('.metric'), vals = [staffPendingReservations.length, backendStaffTables.filter(x => x.status === 'occupied').length, s.serviceRequests.filter(x => x.status === 'Pending').length, backendStaffTables.filter(x => x.reservation_status === 'dining_done').length]; m.forEach((x, i) => { const b = x.querySelector('b'); if (b) b.textContent = vals[i] ?? 0; }); const blocks = sec.querySelectorAll('section.section'); if (blocks[0]) { const list = staffPendingReservations.slice(0, 4).map(r => ({ id: String(r.reservation_id), customerName: r.customer_name, date: localDateString(r.reservation_date), time: String(r.reservation_time).slice(0, 5), status: 'Pending' })); blocks[0].querySelector('.empty,.dynamic-stack')?.remove(); const d = document.createElement('div'); d.className = list.length ? 'dynamic-stack' : 'empty'; d.innerHTML = list.length ? list.map(x => `<div class="dynamic-row"><span><strong>${esc(x.id)}</strong><br><span class="meta">${esc(x.customerName)} · ${esc(formatDate(x.date))} ${esc(x.time)}</span></span><span class="status">${esc(x.status)}</span></div>`).join('') : 'No reservations.'; blocks[0].appendChild(d); } if (blocks[1]) { const list = s.serviceRequests.filter(x => x.status === 'Pending').slice(-4).reverse(); blocks[1].querySelector('.empty,.dynamic-stack')?.remove(); const d = document.createElement('div'); d.className = list.length ? 'dynamic-stack' : 'empty'; d.innerHTML = list.length ? list.map(x => `<div class="dynamic-row"><span><strong>${esc(x.type)}</strong><br><span class="meta">Table ${esc(x.tableId)} · ${esc(x.createdAt)}</span></span><span class="status">${esc(x.status)}</span></div>`).join('') : 'No service requests.'; blocks[1].appendChild(d); } }
+  function renderStaffDashboard() { const s = loadState(), sec = document.getElementById('staff-dashboard'); if (!sec) return; const m = sec.querySelectorAll('.metric'), vals = [staffPendingReservations.length, backendStaffTables.filter(x => x.status === 'occupied').length, liveServiceRequests.filter(x => x.status === 'Pending').length, backendStaffTables.filter(x => x.reservation_status === 'dining_done').length]; m.forEach((x, i) => { const b = x.querySelector('b'); if (b) b.textContent = vals[i] ?? 0; }); const blocks = sec.querySelectorAll('section.section'); if (blocks[0]) { const list = staffPendingReservations.slice(0, 4).map(r => ({ id: String(r.reservation_id), customerName: r.customer_name, date: localDateString(r.reservation_date), time: String(r.reservation_time).slice(0, 5), status: 'Pending' })); blocks[0].querySelector('.empty,.dynamic-stack')?.remove(); const d = document.createElement('div'); d.className = list.length ? 'dynamic-stack' : 'empty'; d.innerHTML = list.length ? list.map(x => `<div class="dynamic-row"><span><strong>${esc(x.id)}</strong><br><span class="meta">${esc(x.customerName)} · ${esc(formatDate(x.date))} ${esc(x.time)}</span></span><span class="status">${esc(x.status)}</span></div>`).join('') : 'No reservations.'; blocks[0].appendChild(d); } if (blocks[1]) { const list = liveServiceRequests.filter(x => x.status === 'Pending').slice(-4).reverse(); blocks[1].querySelector('.empty,.dynamic-stack')?.remove(); const d = document.createElement('div'); d.className = list.length ? 'dynamic-stack' : 'empty'; d.innerHTML = list.length ? list.map(x => `<div class="dynamic-row"><span><strong>${esc(x.type)}</strong><br><span class="meta">Table ${esc(x.tableId)} · ${esc(x.createdAt)}</span></span><span class="status">${esc(x.status)}</span></div>`).join('') : 'No service requests.'; blocks[1].appendChild(d); } }
   let staffPendingReservations = [];
+  let staffAssignableTables = [];
+  let staffOccupancy = { occupied: 0, capacity: 40 };
+  let staffSlotAvailability = null;
   async function syncStaffPendingReservations() {
     if (!['staff', 'admin'].includes(currentSession()?.role)) return;
     const result = await apiRequest('/reservations/pending');
     if (!Array.isArray(result.data)) throw new Error('Unexpected pending reservations response');
     staffPendingReservations = result.data;
+    staffAssignableTables = Array.isArray(result.tables) ? result.tables : [];
+    staffOccupancy = result.occupancy || { occupied: 0, capacity: 40 };
     renderStaffReservations();
   }
   async function refreshStaffPendingWithNotice() {
     try { await syncStaffPendingReservations(); }
-    catch (err) { showToast(`Staff reservations not refreshed: ${err.message}`); }
+    catch (err) { showToastError(`Staff reservations not refreshed: ${err.message}`); }
+  }
+  const staffSlotDate = row => localDateString(row.reservation_date);
+  const staffSlotTime = row => String(row.reservation_time).slice(0, 5);
+  const slotMatches = row => staffSlotAvailability && staffSlotAvailability.date === staffSlotDate(row) && staffSlotAvailability.time === staffSlotTime(row);
+  async function checkStaffSlot(date, time) {
+    const result = await apiRequest(`/reservations/availability?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`);
+    staffSlotAvailability = result;
+    renderStaffReservations();
   }
   function renderStaffReservations() {
     const target = document.querySelector('#staff-reservations section.section');
     if (!target) return;
     const list = staffPendingReservations;
-    target.innerHTML = `<h2>Pending Reservations</h2><div class="actions"><button class="btn btn-secondary dynamic-btn" id="refresh-staff-reservations">Refresh Queue</button></div>` +
-      (list.length ? `<div class="dynamic-stack">${list.map(r => `<div class="card"><div class="section-head"><div><strong>Reservation ${esc(r.reservation_id)} · ${esc(r.customer_name)}</strong><div class="meta">${esc(formatDate(localDateString(r.reservation_date)))} at ${esc(displayTime24h(String(r.reservation_time).slice(0, 5)))} · ${esc(r.guest_count)} guests · Table ${esc(r.table_number)}</div></div><span class="status">Pending</span></div>${r.special_requests ? `<p class="muted">${esc(r.special_requests)}</p>` : ''}<div class="actions"><button class="btn btn-primary dynamic-btn" data-staff-api-confirm="${esc(r.reservation_id)}">Confirm Reservation</button></div></div>`).join('')}</div>` : '<div class="empty">No pending reservations.</div>');
+    const occupancy = Number(staffOccupancy.occupied || 0);
+    const selectedDate = staffSlotAvailability?.date || (list[0] ? staffSlotDate(list[0]) : localDateString(new Date()));
+    const selectedTime = staffSlotAvailability?.time || (list[0] ? staffSlotTime(list[0]) : '19:00');
+    const live = staffSlotAvailability;
+    const heading = `<h2>Pending Reservations</h2><p class="muted">Currently dining: <strong>${occupancy} / 40 guests</strong>. Check future bookings below before assigning a table. Estimated booking window: 2 hours.</p><div class="actions"><button class="btn btn-secondary dynamic-btn" id="refresh-staff-reservations">Refresh Queue</button></div>`;
+    const capacityPanel = `<div class="card" style="margin:16px 0"><h3>Capacity & Availability · 40 Guests / 20 Tables</h3><div class="form-grid"><div class="field"><label for="staff-slot-date">Reservation date</label><input type="date" id="staff-slot-date" value="${esc(selectedDate)}"></div><div class="field"><label for="staff-slot-time">Reservation time</label><input type="time" id="staff-slot-time" value="${esc(selectedTime)}"></div></div><div class="actions"><button class="btn btn-dark dynamic-btn" id="check-staff-slot">Check Availability</button></div>${live ? `<div class="grid-4" aria-live="polite" style="margin-top:14px"><div class="metric"><span>Guests booked</span><b>${esc(live.booked_guests)} / 40</b></div><div class="metric"><span>Guest spaces left</span><b>${esc(live.remaining_guests)}</b></div><div class="metric"><span>Tables assigned</span><b>${esc(live.booked_tables)} / 20</b></div><div class="metric"><span>Tables available</span><b>${esc(live.remaining_tables)}</b></div></div><p class="meta">Availability for ${esc(live.date)} at ${esc(live.time)}. Rechecked securely when Staff confirms.</p>` : '<p class="meta">Select a date and time and click Check Availability to see live bookings and remaining spaces.</p>'}</div>`;
+    target.innerHTML = heading + capacityPanel + (list.length ? `<div class="dynamic-stack">${list.map(r => {
+      const matching = slotMatches(r);
+      const tables = matching ? staffSlotAvailability.tables.filter(t => t.available) : staffAssignableTables;
+      const enoughGuests = !matching || Number(staffSlotAvailability.remaining_guests) >= Number(r.guest_count);
+      const options = tables.map(t => `<option value="${esc(t.table_id)}">Table ${esc(String(t.table_number).padStart(2, '0'))}</option>`).join('');
+      return `<div class="card"><div class="section-head"><div><strong>Reservation ${esc(r.reservation_id)} · ${esc(r.customer_name)}</strong><div class="meta">${esc(formatDate(staffSlotDate(r)))} at ${esc(displayTime24h(staffSlotTime(r)))} · ${esc(r.guest_count)} guests · Awaiting table assignment</div></div><span class="status">Pending</span></div>${r.special_requests ? `<p class="muted">${esc(r.special_requests)}</p>` : ''}<div class="actions"><button class="btn btn-secondary dynamic-btn" data-check-request-slot="${esc(r.reservation_id)}">Check this booking's capacity</button></div>${matching ? `<p class="meta">Booked: ${esc(staffSlotAvailability.booked_guests)}/40 · Available: ${esc(staffSlotAvailability.remaining_guests)} guests · Free tables: ${esc(staffSlotAvailability.remaining_tables)}/20</p>` : '<p class="meta">Check this booking’s date and time for accurate table availability.</p>'}<div class="field"><label for="allocate-${esc(r.reservation_id)}">Assign table</label><select id="allocate-${esc(r.reservation_id)}" data-assign-table="${esc(r.reservation_id)}"><option value="">Choose an available table</option>${options}</select></div><div class="actions"><button class="btn btn-primary dynamic-btn" data-staff-api-confirm="${esc(r.reservation_id)}" ${enoughGuests && tables.length ? '' : 'disabled'}>Assign & Confirm</button></div>${!enoughGuests ? '<p class="meta">Not enough guest capacity at the requested time.</p>' : ''}</div>`;
+    }).join('')}</div>` : '<div class="empty">No pending reservations.</div>');
     target.querySelector('#refresh-staff-reservations')?.addEventListener('click', refreshStaffPendingWithNotice);
+    target.querySelector('#check-staff-slot')?.addEventListener('click', async () => {
+      const date = target.querySelector('#staff-slot-date')?.value;
+      const time = target.querySelector('#staff-slot-time')?.value;
+      try { await checkStaffSlot(date, time); } catch (err) { showToastError(`Availability: ${err.message}`); }
+    });
+    target.querySelectorAll('[data-check-request-slot]').forEach(b => b.addEventListener('click', async () => {
+      const row = list.find(r => String(r.reservation_id) === b.dataset.checkRequestSlot);
+      if (!row) return;
+      try { await checkStaffSlot(staffSlotDate(row), staffSlotTime(row)); } catch (err) { showToastError(`Availability: ${err.message}`); }
+    }));
     target.querySelectorAll('[data-staff-api-confirm]').forEach(b => b.addEventListener('click', async () => {
-      if (b.disabled) return;
+      const id = b.dataset.staffApiConfirm;
+      const select = target.querySelector(`[data-assign-table="${id}"]`);
+      if (!select?.value) return showToastError('Select a table before confirming this reservation.');
       b.disabled = true;
       try {
-        await apiRequest(`/reservations/${encodeURIComponent(b.dataset.staffApiConfirm)}/accept`, { method: 'PATCH' });
-        showToast('Reservation confirmed in MySQL.');
+        await apiRequest(`/reservations/${encodeURIComponent(id)}/accept`, {
+          method: 'PATCH', body: JSON.stringify({ table_id: Number(select.value) })
+        });
+        showToast('Table allocated and reservation confirmed.');
+        staffSlotAvailability = null;
         await syncStaffPendingReservations();
-      } catch (err) { showToast(`Unable to confirm: ${err.message}`); b.disabled = false; }
+        await syncStaffTables().catch(() => { });
+      } catch (err) { showToastError(`Unable to confirm: ${err.message}`); b.disabled = false; }
     }));
   }
 
@@ -1549,7 +1569,7 @@
       await apiRequest(`/reservations/${encodeURIComponent(reservationId)}/close`, { method: 'PATCH' });
       showToast(`Reservation ${reservationId} completed. Table released.`);
       await syncStaffTables();
-    } catch (err) { showToast(`Cannot close table: ${err.message}`); }
+    } catch (err) { showToastError(`Cannot close table: ${err.message}`); }
     finally { releaseTableByStaff.busy = false; }
   }
   function renderStaffTables() {
@@ -1564,12 +1584,12 @@
     grid.innerHTML = tables.map(t => {
       const canClose = t.reservation_status === 'dining_done' && Number(t.remaining_balance) === 0;
       const reservationInfo = t.reservation_id ? `<div class="meta">Reservation ${esc(t.reservation_id)} · ${esc(t.reservation_status)}${t.reservation_status === 'dining_done' ? ` · Balance ${money(t.remaining_balance)}` : ''}</div>` : '';
-      return `<div class="table-card"><strong>Table ${esc(String(t.table_number).padStart(2, '0'))}</strong><div class="status-line"><span class="status">${esc(t.status)}</span><span class="meta">${esc(t.capacity)} seats</span></div>${reservationInfo}<div class="actions"><button class="linkbtn dynamic-btn" data-show-code="${esc(t.table_number)}">View QR Code</button>${canClose ? `<button class="btn btn-primary dynamic-btn" data-close-reservation="${esc(t.reservation_id)}">Close Table / Make Available</button>` : t.reservation_status === 'dining_done' ? '<span class="meta">Payment required before closure</span>' : ''}</div></div>`;
+      return `<div class="table-card"><strong>Table ${esc(String(t.table_number).padStart(2, '0'))}</strong><div class="status-line"><span class="status">${esc(t.status)}</span></div>${reservationInfo}<div class="actions"><button class="linkbtn dynamic-btn" data-show-code="${esc(t.table_number)}">View QR Code</button>${canClose ? `<button class="btn btn-primary dynamic-btn" data-close-reservation="${esc(t.reservation_id)}">Close Table / Make Available</button>` : t.reservation_status === 'dining_done' ? '<span class="meta">Payment required before closure</span>' : ''}</div></div>`;
     }).join('') || '<div class="empty">No tables match this filter.</div>';
     grid.querySelectorAll('[data-show-code]').forEach(b => b.addEventListener('click', () => showToast(`Table code: YUMIO-${String(b.dataset.showCode).padStart(2, '0')}`)));
     grid.querySelectorAll('[data-close-reservation]').forEach(b => b.addEventListener('click', () => releaseTableByStaff(b.dataset.closeReservation)));
   }
-  function renderStaffRequests() { const s = loadState(), target = document.querySelector('#staff-requests section.section'); if (!target) return; const list = [...s.serviceRequests].filter(x => staffViewFilter !== 'pending' || x.status === 'Pending').reverse(); target.innerHTML = list.length ? `<div class="dynamic-stack">${list.map(x => `<div class="card"><div class="section-head"><div><strong>${esc(x.type)} · Table ${esc(x.tableId)}</strong><div class="meta">${esc(x.id)} · ${esc(x.createdAt)}</div></div><span class="status">${esc(x.status)}</span></div>${x.status === 'Pending' ? `<div class="actions"><button class="btn btn-dark dynamic-btn" data-complete-request="${esc(x.id)}">Mark Complete</button></div>` : ''}</div>`).join('')}</div>` : '<div class="empty">No service requests.</div>'; target.querySelectorAll('[data-complete-request]').forEach(b => b.addEventListener('click', () => { const st = loadState(), r = st.serviceRequests.find(x => x.id === b.dataset.completeRequest); if (r) r.status = 'Completed'; saveState(st); renderAll(); showToast('Service request completed.'); })); }
+  function renderStaffRequests() { const s = loadState(), target = document.querySelector('#staff-requests section.section'); if (!target) return; const list = [...liveServiceRequests].filter(x => staffViewFilter !== 'pending' || x.status === 'Pending').reverse(); target.innerHTML = list.length ? `<div class="dynamic-stack">${list.map(x => `<div class="card"><div class="section-head"><div><strong>${esc(x.type)} · Table ${esc(x.tableId)}</strong><div class="meta">${esc(x.id)} · ${esc(x.createdAt)}</div></div><span class="status">${esc(x.status)}</span></div>${x.status === 'Pending' ? `<div class="actions"><button class="btn btn-dark dynamic-btn" data-complete-request="${esc(x.id)}">Mark Complete</button></div>` : ''}</div>`).join('')}</div>` : '<div class="empty">No service requests.</div>'; target.querySelectorAll('[data-complete-request]').forEach(b => b.addEventListener('click', async () => { try { await apiRequest(`/service-requests/${encodeURIComponent(b.dataset.completeRequest)}/complete`, { method: 'PATCH' }); await refreshServiceRequests(); showToast('Service request completed.'); } catch (error) { showToastError(error.message); } })); }
 
   const kitchenStatusName = status => ({
     preordered: 'Pre-Ordered', received: 'Received', accepted: 'Accepted',
@@ -1608,24 +1628,24 @@
       }
       saveState(state);
       renderKitchen();
-    } catch (err) { showToast(`Kitchen sync failed: ${err.message}`); }
+    } catch (err) { showToastError(`Kitchen sync failed: ${err.message}`); }
     finally { kitchenRefreshing = false; }
   }
   async function advanceKitchenOrder(id, target) {
     const state = loadState(), order = state.orders.find(o => String(o.id) === String(id));
-    if (!order) return showToast('Order not found. Refresh Kitchen.');
+    if (!order) return showToastError('Order not found. Refresh Kitchen.');
     const expected = { Received: 'accepted', Accepted: 'preparing', Preparing: 'ready', Ready: 'served' }[order.status];
-    if (!expected || expected !== target.toLowerCase()) return showToast('Invalid Kitchen status transition.');
+    if (!expected || expected !== target.toLowerCase()) return showToastError('Invalid Kitchen status transition.');
     if (order.fromBackend) {
       if (!['kitchen', 'admin'].includes(currentSession()?.role))
-        return showToast('Only Kitchen Personnel or Admin can update food status.');
+        return showToastError('Only Kitchen Personnel or Admin can update food status.');
       try {
         await apiRequest(`/kitchen/orders/${encodeURIComponent(id)}/status`, {
           method: 'PATCH', body: JSON.stringify({ status: expected })
         });
         await syncKitchenFromBackend();
         showToast(`Order ${id} updated to ${target}.`);
-      } catch (err) { showToast(`Kitchen update failed: ${err.message}`); }
+      } catch (err) { showToastError(`Kitchen update failed: ${err.message}`); }
     } else {
       order.status = target;
       saveState(state); renderAll(); showToast(`Demo order ${id} updated.`);
@@ -1635,16 +1655,253 @@
   function renderKitchenDashboard() { const s = loadState(), board = document.querySelector('#kitchen-dashboard .kitchen-board'); if (!board) return; const cols = board.querySelectorAll('.kitchen-col'), groups = [s.orders.filter(o => o.status === 'Pre-Ordered'), s.orders.filter(o => ['Received', 'Accepted'].includes(o.status)), s.orders.filter(o => o.status === 'Preparing'), s.orders.filter(o => o.status === 'Ready')]; cols.forEach((col, i) => { const heading = col.querySelector('h2')?.outerHTML || ''; const list = groups[i]; col.innerHTML = heading + (list.length ? list.map(o => `<div class="kitchen-order"><strong>${esc(o.id)} · Table ${esc(o.tableId)}</strong><div class="meta">${o.items.reduce((a, x) => a + x.quantity, 0)} items · ${esc(o.status)}${o.status === 'Pre-Ordered' ? ' · Waiting for customer check-in' : ''}</div><div class="actions"><button class="btn btn-secondary dynamic-btn" data-kitchen-order="${esc(o.id)}">View Items</button>${({ Received: 'Accept', Accepted: 'Start Preparing', Preparing: 'Mark Ready', Ready: 'Mark Served' }[o.status]) ? `<button class="btn btn-dark dynamic-btn" data-kitchen-advance="${esc(o.id)}">${esc({ Received: 'Accept', Accepted: 'Start Preparing', Preparing: 'Mark Ready', Ready: 'Mark Served' }[o.status])}</button>` : ''}</div></div>`).join('') : `<div class="empty">${i === 0 ? 'No scheduled pre-orders.' : i === 1 ? 'No new orders.' : i === 2 ? 'No orders preparing.' : 'No orders ready.'}</div>`); }); board.querySelectorAll('[data-kitchen-order]').forEach(b => b.addEventListener('click', () => { const st = loadState(); st.selectedOrderId = b.dataset.kitchenOrder; saveState(st); renderKitchenDetail(); location.hash = '#kitchen-order-detail'; })); board.querySelectorAll('[data-kitchen-advance]').forEach(b => b.addEventListener('click', () => { const st = loadState(), o = st.orders.find(x => x.id === b.dataset.kitchenAdvance); const next = { Received: 'Accepted', Accepted: 'Preparing', Preparing: 'Ready', Ready: 'Served' }; if (!o || !next[o.status]) return; advanceKitchenOrder(o.id, next[o.status]); })); }
   function renderKitchenDetail() { const s = loadState(), target = document.querySelector('#kitchen-order-detail section.section'), o = s.orders.find(x => x.id === s.selectedOrderId); if (!target) return; if (!o) { target.innerHTML = '<div class="empty">No kitchen order is selected.</div>'; return; } const next = { Received: ['Accepted', 'Accept Order'], Accepted: ['Preparing', 'Start Preparing'], Preparing: ['Ready', 'Mark Ready'], Ready: ['Served', 'Mark Served'] }[o.status]; target.innerHTML = `<div class="section-head"><div><h2>${esc(o.id)} · Table ${esc(o.tableId)}</h2><div class="meta">${esc(o.createdAt)}</div></div><span class="status">${esc(o.status)}</span></div><div class="dynamic-stack">${o.items.map(x => `<div class="dynamic-row"><span><strong>${esc(x.quantity)} × ${esc(x.name)}</strong>${x.notes ? `<br><span class="meta">${esc(x.notes)}</span>` : ''}</span><span>${money(x.price * x.quantity)}</span></div>`).join('')}</div>${next ? `<div class="actions"><button class="btn btn-dark dynamic-btn" data-next-order-status="${esc(next[0])}">${esc(next[1])}</button></div>` : o.status === 'Served' ? '<div class="empty">This order has been served.</div>' : o.status === 'Pre-Ordered' ? '<div class="empty">This pre-order is scheduled. Preparation becomes available after customer check-in.</div>' : o.status === 'Cancelled' ? '<div class="empty">This order was cancelled.</div>' : `<div class="empty">Order status: ${esc(o.status)}.</div>`}`; target.querySelector('[data-next-order-status]')?.addEventListener('click', e => { const st = loadState(), live = st.orders.find(x => x.id === o.id); if (!live) return; advanceKitchenOrder(o.id, e.currentTarget.dataset.nextOrderStatus); }); }
 
-  function initManagerForms() {
-    document.getElementById('manager-add-menu-form')?.addEventListener('submit', e => { e.preventDefault(); const name = document.getElementById('add-item-name')?.value.trim(), price = Number(document.getElementById('add-item-price')?.value), category = document.getElementById('add-item-category')?.value, icon = document.getElementById('add-item-icon')?.value.trim() || '🍽️', description = document.getElementById('add-item-description')?.value.trim() || ''; if (!name || !Number.isFinite(price) || price <= 0 || !category) return showToast('Enter a valid item name, price and category.'); const s = loadState(); s.menu.push({ id: `custom-${Date.now()}`, name, price, category, icon, description, available: true }); saveState(s); e.currentTarget.reset(); document.getElementById('add-item-icon').value = '🍽️'; renderAll(); showToast('Menu item added.'); location.hash = '#manager-menu'; });
-    document.getElementById('manager-edit-menu-form')?.addEventListener('submit', e => { e.preventDefault(); const s = loadState(), item = s.menu.find(x => x.id === s.selectedMenuItemId); if (!item) return showToast('Choose a menu item to edit.'); const name = document.getElementById('edit-item-name')?.value.trim(), price = Number(document.getElementById('edit-item-price')?.value), category = document.getElementById('edit-item-category')?.value, icon = document.getElementById('edit-item-icon')?.value.trim() || '🍽️', description = document.getElementById('edit-item-description')?.value.trim() || ''; if (!name || !Number.isFinite(price) || price <= 0 || !category) return showToast('Enter a valid item name, price and category.'); Object.assign(item, { name, price, category, icon, description }); saveState(s); renderAll(); showToast('Menu item updated.'); location.hash = '#manager-menu'; });
+  async function refreshAdminMenu() {
+    if (currentSession()?.role !== 'admin') return;
+    const result = await apiRequest('/menu/admin/items');
+    if (!Array.isArray(result.data)) throw new Error('Invalid Admin menu response');
+    const icons = new Map(SEED_MENU.map(x => [x.name.toLowerCase(), x.icon]));
+    const state = loadState();
+    state.menu = result.data.map(row => ({
+      id: `item-${Number(row.item_id)}`,
+      name: row.item_name,
+      description: row.description || '',
+      category: row.category,
+      price: Number(row.price),
+      icon: icons.get(String(row.item_name).toLowerCase()) || '🍽️',
+      image: row.image_url || '',
+      available: Boolean(Number(row.is_available))
+    }));
+    saveState(state);
+    renderManagerMenu();
+    renderManagerEditForm();
   }
-  function renderManager() { renderManagerDashboard(); renderManagerMenu(); renderManagerHistory(); renderManagerEditForm(); }
-  function renderManagerDashboard() { const s = loadState(), sec = document.getElementById('manager-dashboard'); if (!sec) return; const m = sec.querySelectorAll('.metric'), vals = [s.reservations.length, s.orders.length, money(s.payments.reduce((a, x) => a + x.amount, 0)), 1]; m.forEach((x, i) => { const b = x.querySelector('b'); if (b) b.textContent = vals[i] ?? 0; }); const snap = sec.querySelector('section.section'), sm = snap?.querySelectorAll('.metric'); if (sm?.length >= 3) { const avail = s.tables.filter(x => x.status === 'Available').length, occ = s.tables.filter(x => x.status === 'Occupied').length, res = s.tables.filter(x => x.status === 'Reserved').length, active = s.orders.filter(x => x.status !== 'Served').length, req = s.serviceRequests.filter(x => x.status === 'Pending').length; let b = sm[0].querySelector('b'), small = sm[0].querySelector('small'); if (b) b.textContent = s.tables.length; if (small) small.textContent = `${avail} available · ${occ} occupied · ${res} reserved`; b = sm[1].querySelector('b'); small = sm[1].querySelector('small'); if (b) b.textContent = active; if (small) small.textContent = active ? 'Active kitchen orders' : 'No active orders'; b = sm[2].querySelector('b'); small = sm[2].querySelector('small'); if (b) b.textContent = req; if (small) small.textContent = req ? 'Pending requests' : 'No pending requests'; } }
-  function renderManagerMenu() { const s = loadState(), grid = document.querySelector('#manager-menu .menu-admin-grid'); if (!grid) return; grid.innerHTML = s.menu.map(item => `<div class="menu-admin-card ${item.available ? '' : 'menu-item-hidden'}"><div class="menu-admin-icon">${esc(item.icon || '🍽️')}</div><div><div class="section-head"><div><strong>${esc(item.name)}</strong><div class="meta">${esc(item.category)} · ${item.price == null ? 'Price TBC' : money(item.price)}</div></div><span class="status">${item.available ? 'Available' : 'Hidden'}</span></div><p class="muted">${esc(item.description || '')}</p><div class="actions"><button class="btn btn-outline dynamic-btn" data-menu-action="edit" data-id="${esc(item.id)}">Edit</button><button class="btn btn-secondary dynamic-btn" data-menu-action="toggle" data-id="${esc(item.id)}">${item.available ? 'Hide' : 'Show'}</button><button class="btn btn-secondary dynamic-btn" data-menu-action="remove" data-id="${esc(item.id)}">Remove</button></div></div></div>`).join(''); grid.querySelectorAll('[data-menu-action]').forEach(b => b.addEventListener('click', () => { const st = loadState(), item = st.menu.find(x => x.id === b.dataset.id); if (!item) return; const a = b.dataset.menuAction; if (a === 'edit') { st.selectedMenuItemId = item.id; saveState(st); renderManagerEditForm(); location.hash = '#manager-menu-edit'; return; } if (a === 'toggle') item.available = !item.available; if (a === 'remove') st.menu = st.menu.filter(x => x.id !== item.id); saveState(st); renderAll(); showToast(a === 'remove' ? 'Menu item removed.' : `Menu item ${item.available ? 'shown' : 'hidden'}.`); })); }
+  async function refreshAdminHistory() {
+    if (currentSession()?.role !== 'admin') return;
+    const data = await apiRequest('/admin/history');
+    if (!Array.isArray(data.reservations) || !Array.isArray(data.orders) || !Array.isArray(data.payments)) throw new Error('Invalid Admin history response');
+    managerHistoryData = data;
+    renderManagerHistory();
+  }
+  function initManagerForms() {
+    document.getElementById('manager-add-menu-form')?.addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = event.currentTarget.querySelector('[type="submit"]');
+      const name = document.getElementById('add-item-name')?.value.trim();
+      const price = Number(document.getElementById('add-item-price')?.value);
+      const category = document.getElementById('add-item-category')?.value;
+      const description = document.getElementById('add-item-description')?.value.trim() || '';
+      if (!name || !Number.isFinite(price) || price <= 0 || !category) return showToastError('Enter a valid item name, price and category.');
+      if (button) button.disabled = true;
+      try {
+        await apiRequest('/menu/admin/items', { method: 'POST', body: JSON.stringify({ name, price, category, description }) });
+        event.currentTarget.reset();
+        await refreshAdminMenu();
+        showToast('Menu updated successfully');
+        location.hash = '#manager-menu';
+      } catch (error) { showToastError(`Unable to save menu item: ${error.message}`); }
+      finally { if (button) button.disabled = false; }
+    });
+    document.getElementById('manager-edit-menu-form')?.addEventListener('submit', async event => {
+      event.preventDefault();
+      const item = loadState().menu.find(row => row.id === loadState().selectedMenuItemId);
+      if (!item) return showToastError('Choose a menu item to edit.');
+      const name = document.getElementById('edit-item-name')?.value.trim();
+      const price = Number(document.getElementById('edit-item-price')?.value);
+      const category = document.getElementById('edit-item-category')?.value;
+      const description = document.getElementById('edit-item-description')?.value.trim() || '';
+      const button = event.currentTarget.querySelector('[type="submit"]');
+      if (!name || !Number.isFinite(price) || price <= 0 || !category) return showToastError('Enter a valid item name, price and category.');
+      if (button) button.disabled = true;
+      try {
+        await apiRequest(`/menu/admin/items/${encodeURIComponent(item.id.replace('item-', ''))}`, { method: 'PATCH', body: JSON.stringify({ name, price, category, description }) });
+        await refreshAdminMenu();
+        showToast('Menu updated successfully');
+        location.hash = '#manager-menu';
+      } catch (error) { showToastError(`Unable to update item: ${error.message}`); }
+      finally { if (button) button.disabled = false; }
+    });
+  }
+  let managerCapacity = null;
+  let managerOverview = null;
+  let managerHistoryData = null;
+  let managerPending = [];
+  let managerTables = [];
+  let managerPhysicalOccupancy = null;
+  let managerLoading = false;
+  let managerRefreshQueued = false;
+  const managerDate = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Indian/Maldives', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const managerTime = (r) => String(r.reservation_time || '').slice(0, 5);
+  const managerRowDate = (r) => localDateString(r.reservation_date);
+  async function refreshManagerOverview(checkSlot = true) {
+    if (currentSession()?.role !== 'admin') return;
+    if (managerLoading) { managerRefreshQueued = true; return; }
+    managerLoading = true;
+    try {
+      const [pending, tables] = await Promise.all([
+        apiRequest('/reservations/pending'),
+        apiRequest('/staff/tables')
+      ]);
+      managerPending = Array.isArray(pending.data) ? pending.data : [];
+      managerTables = Array.isArray(tables.data) ? tables.data : [];
+      managerPhysicalOccupancy = Number(pending.occupancy?.occupied || 0);
+      try {
+        const overview = await apiRequest('/admin/overview');
+        if (!overview.success || !Number.isSafeInteger(Number(overview.registered_customers))) throw new Error('Invalid Admin overview');
+        managerOverview = overview;
+      } catch (error) {
+        managerOverview = null;
+        console.error('Admin overview error:', error.message);
+      }
+      const dateField = document.getElementById('manager-slot-date');
+      const timeField = document.getElementById('manager-slot-time');
+      if (dateField && !dateField.value) dateField.value = managerDate();
+      if (checkSlot && dateField?.value && timeField?.value) {
+        const checkedDate = dateField.value;
+        const checkedTime = timeField.value;
+        const capacity = await apiRequest(`/reservations/availability?date=${encodeURIComponent(checkedDate)}&time=${encodeURIComponent(checkedTime)}`);
+        const booked = Number(capacity.booked_guests);
+        const limit = Number(capacity.capacity);
+        if (!capacity.success || !Number.isSafeInteger(booked) || !Number.isSafeInteger(limit) || limit !== 40 || booked < 0 || booked > limit || capacity.date !== checkedDate || capacity.time !== checkedTime) throw new Error('Invalid database capacity response');
+        managerCapacity = { ...capacity, booked_guests: booked, remaining_guests: limit - booked };
+      }
+      renderManagerCapacity();
+      renderManagerDashboard();
+      await refreshAdminHistory().catch(error => { managerHistoryData = null; console.error('Admin history error:', error.message); renderManagerHistory(); });
+    } catch (error) {
+      managerCapacity = null;
+      const target = document.getElementById('manager-capacity-results');
+      if (target) target.innerHTML = `<p role="alert" class="muted">Unable to load live capacity: ${esc(error.message)}.</p>`;
+    } finally {
+      renderManagerDashboard();
+      managerLoading = false;
+      if (managerRefreshQueued) { managerRefreshQueued = false; refreshManagerOverview(true); }
+    }
+  }
+  function renderManagerCapacity() {
+    const result = document.getElementById('manager-capacity-results');
+    const pending = document.getElementById('manager-pending-requests');
+    const panel = document.getElementById('manager-capacity-panel');
+    if (!panel || currentSession()?.role !== 'admin') return;
+    const c = managerCapacity;
+    if (result && c) {
+      const free = (c.tables || []).filter(t => t.available);
+      result.innerHTML = `<div class="grid-4">
+        <div class="metric" data-capacity-metric="guests"><span>Guests booked</span><b>${esc(c.booked_guests)} / ${esc(c.capacity)}</b></div>
+        <div class="metric" data-capacity-metric="remaining-guests"><span>Remaining guest spaces</span><b>${esc(c.remaining_guests)}</b></div>
+        <div class="metric" data-capacity-metric="tables"><span>Assigned tables</span><b>${esc(c.booked_tables)} / ${esc(c.maximum_tables)}</b></div>
+        <div class="metric" data-capacity-metric="remaining-tables"><span>Available tables</span><b>${esc(c.remaining_tables)}</b></div>
+      </div><p class="meta" style="margin-top:12px">Free table numbers: ${free.length ? free.map(t => esc(String(t.table_number).padStart(2, '0'))).join(', ') : 'None'}.</p>
+      <p class="meta">Date: ${esc(c.date)} · Time: ${esc(c.time)} · Capacity is rechecked by the server at confirmation.</p>`;
+    }
+    if (!pending) return;
+    pending.innerHTML = managerPending.length ? `<div class="dynamic-stack">${managerPending.map(r => {
+      const matching = c && c.date === managerRowDate(r) && c.time === managerTime(r);
+      const options = matching ? (c.tables || []).filter(t => t.available) : [];
+      const enough = matching && Number(c.remaining_guests) >= Number(r.guest_count) && options.length;
+      return `<div class="card"><div class="section-head"><div><strong>Reservation #${esc(r.reservation_id)} · ${esc(r.customer_name)}</strong>
+      <div class="meta">${esc(managerRowDate(r))} ${esc(displayTime24h(managerTime(r)))} · ${esc(r.guest_count)} guests</div></div><span class="status">Pending</span></div>
+      <div class="actions"><button type="button" class="btn btn-secondary" data-manager-check-id="${esc(r.reservation_id)}">Check this booking</button></div>
+      <div class="field"><label for="manager-assign-${esc(r.reservation_id)}">Assign table</label><select id="manager-assign-${esc(r.reservation_id)}" data-manager-table-id="${esc(r.reservation_id)}" ${matching ? '' : 'disabled'}><option value="">${matching ? 'Choose a free table' : 'Check this booking first'}</option>${options.map(t => `<option value="${esc(t.table_id)}">Table ${esc(String(t.table_number).padStart(2, '0'))}</option>`).join('')}</select></div>
+      <div class="actions"><button type="button" class="btn btn-primary" data-manager-approve-id="${esc(r.reservation_id)}" ${enough ? '' : 'disabled'}>Assign & Confirm</button></div>
+      ${matching && !enough ? '<p class="meta">No sufficient guest capacity or free tables at this time.</p>' : ''}</div>`;
+    }).join('')}</div>` : '<div class="empty">No pending reservations.</div>';
+    pending.querySelectorAll('[data-manager-check-id]').forEach(b => b.addEventListener('click', async () => {
+      const r = managerPending.find(x => String(x.reservation_id) === b.dataset.managerCheckId);
+      if (!r) return;
+      panel.querySelector('#manager-slot-date').value = managerRowDate(r);
+      panel.querySelector('#manager-slot-time').value = managerTime(r);
+      await refreshManagerOverview(true);
+    }));
+    pending.querySelectorAll('[data-manager-approve-id]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.managerApproveId;
+      const tableId = pending.querySelector(`[data-manager-table-id="${id}"]`)?.value;
+      if (!tableId) return showToastError('Choose an available table first.');
+      b.disabled = true;
+      try {
+        await apiRequest(`/reservations/${encodeURIComponent(id)}/accept`, { method: 'PATCH', body: JSON.stringify({ table_id: Number(tableId) }) });
+        showToast(`Reservation ${id} confirmed. Confirmation email queued.`);
+        managerCapacity = null;
+        await refreshManagerOverview(true);
+      } catch (err) { showToastError(`Confirmation failed: ${err.message}`); b.disabled = false; }
+    }));
+  }
+  function initManagerCapacity() {
+    const panel = document.getElementById('manager-capacity-panel');
+    panel?.querySelector('#manager-refresh-capacity')?.addEventListener('click', () => refreshManagerOverview(true));
+    panel?.querySelector('#manager-check-slot')?.addEventListener('click', () => refreshManagerOverview(true));
+    const refreshOnChange = () => {
+      managerCapacity = null;
+      const result = document.getElementById('manager-capacity-results');
+      if (result) result.innerHTML = '<p class="muted" role="status">Loading availability from MySQL…</p>';
+      refreshManagerOverview(true);
+    };
+    panel?.querySelector('#manager-slot-date')?.addEventListener('change', refreshOnChange);
+    panel?.querySelector('#manager-slot-time')?.addEventListener('change', refreshOnChange);
+    setInterval(() => {
+      if (currentSession()?.role === 'admin' && screenId() === 'manager-dashboard' && !document.querySelector('#manager-pending-requests:focus-within')) refreshManagerOverview(true);
+    }, 30000);
+  }
+  function renderManager() { renderManagerCapacity(); renderManagerDashboard(); renderManagerMenu(); renderManagerHistory(); renderManagerEditForm(); }
+  function renderManagerDashboard() {
+    const sec = document.getElementById('manager-dashboard');
+    if (!sec) return;
+    const summary = sec.querySelector('.admin-body > section.grid-4');
+    const metrics = summary ? Array.from(summary.children).filter(element => element.classList.contains('metric')) : [];
+    const data = managerOverview;
+    const values = data ? [
+      data.pending_reservations,
+      data.total_orders,
+      money(Number(data.completed_payments_total)),
+      data.registered_customers
+    ] : ['—', '—', '—', '—'];
+    metrics.slice(0, 4).forEach((metric, index) => {
+      const value = metric.querySelector('b');
+      if (value) value.textContent = values[index];
+    });
+    const snapshot = Array.from(sec.querySelectorAll('.admin-body > section.section')).find(section => section.querySelector('h2')?.textContent.trim() === 'Restaurant Snapshot');
+    const boxes = snapshot ? snapshot.querySelectorAll('.grid-3 > .metric') : [];
+    if (boxes.length >= 3) {
+      const tablesValue = boxes[0].querySelector('b');
+      const tablesDetails = boxes[0].querySelector('small');
+      if (tablesValue) tablesValue.textContent = managerTables.length || '—';
+      if (tablesDetails) tablesDetails.textContent = managerTables.length ? `${managerTables.filter(t => t.status === 'available').length} available · ${managerTables.filter(t => t.status === 'occupied').length} occupied · ${managerTables.filter(t => t.status === 'reserved').length} reserved · ${managerPhysicalOccupancy ?? '—'}/40 guests dining` : 'Live data loading';
+      const kitchenValue = boxes[1].querySelector('b');
+      const kitchenDetails = boxes[1].querySelector('small');
+      if (kitchenValue) kitchenValue.textContent = data ? data.active_kitchen_orders : '—';
+      if (kitchenDetails) kitchenDetails.textContent = data ? 'Active database orders' : 'Database unavailable';
+      const requestsValue = boxes[2].querySelector('b');
+      const requestsDetails = boxes[2].querySelector('small');
+      if (requestsValue) requestsValue.textContent = data ? data.pending_service_requests : '—';
+      if (requestsDetails) requestsDetails.textContent = data ? `${data.pending_service_requests} pending · ${data.total_service_requests} total requests` : 'Database unavailable';
+    }
+  }
+  function renderManagerMenu() {
+    const state = loadState(), grid = document.querySelector('#manager-menu .menu-admin-grid');
+    if (!grid) return;
+    grid.innerHTML = state.menu.map(item => `<div class="menu-admin-card ${item.available ? '' : 'menu-item-hidden'}"><div class="menu-admin-icon">${esc(item.icon || '🍽️')}</div><div><div class="section-head"><div><strong>${esc(item.name)}</strong><div class="meta">${esc(item.category)} · ${money(item.price)}</div></div><span class="status">${item.available ? 'Available' : 'Hidden'}</span></div><p class="muted">${esc(item.description || '')}</p><div class="actions"><button class="btn btn-outline dynamic-btn" data-menu-action="edit" data-id="${esc(item.id)}">Edit</button><button class="btn btn-secondary dynamic-btn" data-menu-action="toggle" data-id="${esc(item.id)}">${item.available ? 'Hide' : 'Show'}</button><button class="btn btn-secondary dynamic-btn" data-menu-action="remove" data-id="${esc(item.id)}">Archive</button></div></div></div>`).join('');
+    grid.querySelectorAll('[data-menu-action]').forEach(button => button.addEventListener('click', async () => {
+      const state = loadState(), item = state.menu.find(x => x.id === button.dataset.id);
+      if (!item) return;
+      const action = button.dataset.menuAction;
+      if (action === 'edit') {
+        state.selectedMenuItemId = item.id;
+        saveState(state);
+        renderManagerEditForm();
+        location.hash = '#manager-menu-edit';
+        return;
+      }
+      const id = encodeURIComponent(item.id.replace('item-', ''));
+      if (action === 'remove' && !confirm(`Archive ${item.name} from the customer menu? Its historical orders will remain available.`)) return;
+      button.disabled = true;
+      try {
+        if (action === 'toggle') await apiRequest(`/menu/admin/items/${id}/availability`, { method: 'PATCH', body: JSON.stringify({ available: !item.available }) });
+        else await apiRequest(`/menu/admin/items/${id}`, { method: 'DELETE' });
+        await refreshAdminMenu();
+        showToast('Menu updated successfully');
+      } catch (error) { showToastError(`Menu change failed: ${error.message}`); button.disabled = false; }
+    }));
+  }
   function renderManagerEditForm() { const s = loadState(), item = s.menu.find(x => x.id === s.selectedMenuItemId); if (!item) return; const map = { 'edit-item-name': item.name, 'edit-item-price': item.price ?? '', 'edit-item-category': item.category, 'edit-item-icon': item.icon || '🍽️', 'edit-item-description': item.description || '' }; Object.entries(map).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.value = v; }); }
-  // Phase 6: History views are newest-first, regardless of API/array order.
-  // Use the record's creation timestamp where available; fall back to numeric IDs.
   function historyIdNumber(value) {
     const match = String(value ?? '').match(/(\d+)$/);
     return match ? Number(match[1]) : -1;
@@ -1652,7 +1909,6 @@
   function historyTime(value) {
     if (!value) return NaN;
     const text = String(value).trim();
-    // SQL datetime strings (without timezone) are interpreted as Maldives time.
     const iso = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(text) ? text.replace(' ', 'T') + '+05:00' : text;
     const n = Date.parse(iso);
     return Number.isFinite(n) ? n : NaN;
@@ -1662,8 +1918,6 @@
       const at = historyTime(a.createdAt ?? a.created_at ?? a.timestamp);
       const bt = historyTime(b.createdAt ?? b.created_at ?? b.timestamp);
       if (Number.isFinite(at) && Number.isFinite(bt) && at !== bt) return bt - at;
-      // IDs are comparable within a single record type. Mixed-type histories
-      // primarily use timestamps and preserve source order when absent.
       const ai = historyIdNumber(a.id ?? a.sortId);
       const bi = historyIdNumber(b.id ?? b.sortId);
       if (a.kind === b.kind && ai !== bi) return bi - ai;
@@ -1671,7 +1925,37 @@
     });
   }
   function renderHistorySection(screen, heading, rows) { const sec = document.getElementById(screen), target = sec?.querySelector('section.section'); if (!target) return; const tabs = target.querySelector('.history-tabs')?.outerHTML || '', p = target.querySelector('p.meta')?.outerHTML || ''; target.innerHTML = `<h2>${esc(heading)}</h2>${p}${tabs}${rows.length ? `<div class="dynamic-stack" style="margin-top:18px">${newestFirst(rows).map(r => `<div class="card"><strong>${esc(r.title)}</strong><div class="meta">${esc(r.meta)}</div></div>`).join('')}</div>` : `<div class="empty" style="margin-top:18px">No ${esc(heading.toLowerCase())} history.</div>`}`; }
-  function renderManagerHistory() { const s = loadState(); renderHistorySection('manager-history-orders', 'Orders', s.orders.map(o => ({ id: o.id, kind: "orders", createdAt: o.createdAt ?? o.created_at, title: `${o.id} · Table ${o.tableId}`, meta: `${o.status} · ${money(o.total)} · ${o.createdAt}` }))); renderHistorySection('manager-history-reservations', 'Reservations', s.reservations.map(r => ({ id: r.id, kind: "reservations", createdAt: r.createdAt ?? r.created_at, title: `${r.id} · ${r.customerName}`, meta: `${formatDate(r.date)} ${r.time} · ${r.guests} guests · ${r.status}${r.tableId ? ` · Table ${r.tableId}` : ''}` }))); renderHistorySection('manager-history-payments', 'Payments', s.payments.map(p => ({ id: p.id, kind: "payments", createdAt: p.createdAt ?? p.created_at, title: `${p.id} · ${money(p.amount)}`, meta: `${p.status} · ${p.method} · ${p.createdAt}` }))); renderHistorySection('manager-history-customers', 'Customers', [{ title: 'Shanku', meta: 'shanku@yumio.test · Customer' }]); renderHistorySection('manager-history-requests', 'Service Requests', s.serviceRequests.map(r => ({ id: r.id, kind: "serviceRequests", createdAt: r.createdAt ?? r.created_at, title: `${r.id} · ${r.type}`, meta: `Table ${r.tableId} · ${r.status} · ${r.createdAt}` }))); }
+  function renderManagerHistory() {
+    const data = managerHistoryData;
+    const orders = (data?.orders || []).map(o => ({ id: o.order_id, kind: 'orders', createdAt: o.created_at, title: `Order #${o.order_id} · ${o.customer_name}`, meta: `Reservation #${o.reservation_id} · ${o.order_type} · ${o.status} · ${money(Number(o.total_amount))} · Table ${o.table_number ?? 'Unassigned'}` }));
+    const reservations = (data?.reservations || []).map(r => ({ id: r.reservation_id, kind: 'reservations', title: `Reservation #${r.reservation_id} · ${r.customer_name}`, meta: `${r.reservation_date} ${String(r.reservation_time).slice(0, 5)} · ${r.guest_count} guests · ${r.status} · Table ${r.table_number ?? 'Unassigned'}` }));
+    const payments = (data?.payments || []).map(p => ({ id: p.payment_id, kind: 'payments', createdAt: p.paid_at, title: `Payment #${p.payment_id} · ${p.customer_name}`, meta: `Reservation #${p.reservation_id} · ${p.payment_type} · ${p.payment_status} · ${money(Number(p.amount))}` }));
+    renderHistorySection('manager-history-orders', 'Orders', orders);
+    renderHistorySection('manager-history-reservations', 'Reservations', reservations);
+    renderHistorySection('manager-history-payments', 'Payments', payments);
+    renderHistorySection('manager-history-customers', 'Customers', (managerOverview?.customers || []).map(u => ({ id: u.user_id, kind: 'customers', title: u.full_name, meta: `${u.email} · Customer` })));
+    renderHistorySection('manager-history-requests', 'Service Requests', (managerOverview?.service_requests || []).map(r => ({ id: r.request_id, kind: 'serviceRequests', createdAt: r.created_at, title: `${r.request_id} · ${r.request_type}`, meta: `Table ${r.table_number ?? 'Unassigned'} · ${r.status} · ${r.created_at}` })));
+  }
+
+  async function refreshCustomerReceipts() {
+    if (currentSession()?.role !== 'customer') return;
+    const section = document.querySelector('#customer-history .page') || document.querySelector('#customer-history main');
+    if (!section) return;
+    let host = document.getElementById('yumio-receipts');
+    if (!host) { host = document.createElement('section'); host.id = 'yumio-receipts'; host.className = 'section'; section.appendChild(host); }
+    try {
+      const result = await apiRequest('/receipts/my');
+      const receipts = result.data || [];
+      host.innerHTML = `<h2>Payment & Refund Receipts</h2><p class="muted">Receipts are for simulated Yumio transactions only; no actual bank payment or refund occurred.</p>` +
+        (receipts.length ? `<div class="dynamic-stack">${receipts.map(x => `<div class="dynamic-row"><span><strong>${esc(x.receipt_number)}</strong><br><span class="meta">${esc(x.type === 'payment' ? 'Payment' : 'Refund / cancellation')} · Reservation ${esc(x.reservation_id)} · MVR ${esc(x.amount)} · ${esc(x.created_at || '')}</span></span><a class="btn btn-secondary" href="/api/receipts/${encodeURIComponent(x.type)}/${encodeURIComponent(x.id)}" target="_blank" rel="noopener">View / Print Receipt</a></div>`).join('')}</div>` : '<div class="empty">No completed payment or refund receipts yet.</div>');
+    } catch (error) { host.innerHTML = `<h2>Payment & Refund Receipts</h2><p class="muted">Unable to load receipts: ${esc(error.message)}</p>`; }
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('a[href="#customer-history"]')) refreshCustomerReceipts();
+  });
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#customer-history') refreshCustomerReceipts();
+  });
 
   function renderCustomerHistory() {
     const s = loadState(), sec = document.getElementById('customer-history');
@@ -1697,7 +1981,7 @@
             <div class="section-head">
               <div>
                 <strong>${esc(r.id)}</strong>
-                <div class="meta">${esc(formatDate(r.date))} at ${esc(displayTime24h(r.time))} · ${r.guests} guest${r.guests === 1 ? '' : 's'} · Table ${esc(r.tableId)}</div>
+                <div class="meta">${esc(formatDate(r.date))} at ${esc(displayTime24h(r.time))} · ${r.guests} guest${r.guests === 1 ? '' : 's'} · ${r.tableId ? `Table ${esc(r.tableId)}` : 'Awaiting table allocation'}</div>
               </div>
               <span class="status">${esc(r.status)}</span>
             </div>
@@ -1782,7 +2066,6 @@
     }
   }
 
-  // Read-only role-specific history views; all screens use the existing browser data.
   const historyFilters = Object.create(null);
   const histVal = v => String(v ?? '');
   const histText = v => esc(histVal(v));
@@ -1838,13 +2121,11 @@
       main.focus({ preventScroll: false });
     });
   }
-  // Keep account details tied to the currently authenticated backend session.
   function renderSignedInIdentity() {
     const user = currentSession();
     if (!user) return;
     const email = String(user.email || '');
     const name = String(user.name || '').trim() || email.split('@')[0] || 'Customer';
-    // The original HTML contains a hardcoded test account in every header.
     document.querySelectorAll('.prototype-screen .signed-area').forEach(el => {
       el.textContent = email;
     });
@@ -1869,8 +2150,12 @@
     if (!guardRoute()) return;
     renderAll();
     if (currentSession()?.role === 'kitchen' && screenId().startsWith('kitchen-')) syncKitchenFromBackend();
-    if (currentSession()?.role === 'staff' && ['staff-dashboard', 'staff-tables'].includes(screenId())) syncStaffTables().catch(err => showToast(`Staff tables: ${err.message}`));
-    if (currentSession()?.role === 'customer' && ['bill', 'payment'].includes(screenId())) refreshFinalBill().catch(err => showToast(`Billing: ${err.message}`));
+    if (currentSession()?.role === 'admin' && screenId() === 'manager-dashboard') refreshManagerOverview(true);
+    if (currentSession()?.role === 'admin' && screenId() === 'manager-menu') refreshAdminMenu().catch(error => showToastError(`Admin menu: ${error.message}`));
+    if (currentSession()?.role === 'admin' && screenId().startsWith('manager-history-')) refreshAdminHistory().catch(error => showToastError(`Admin history: ${error.message}`));
+    if (currentSession()?.role === 'staff' && ['staff-dashboard', 'staff-tables'].includes(screenId())) syncStaffTables().catch(err => showToastError(`Staff tables: ${err.message}`));
+    if (currentSession()?.role === 'staff' && ['staff-dashboard', 'staff-requests'].includes(screenId())) refreshServiceRequests().catch(err => showToastError(`Service requests: ${err.message}`));
+    if (currentSession()?.role === 'customer' && ['bill', 'payment'].includes(screenId())) refreshFinalBill().catch(err => showToastError(`Billing: ${err.message}`));
     if (currentSession()?.role === 'staff' && screenId() === 'staff-reservations') {
       refreshStaffPendingWithNotice();
     }
@@ -1883,7 +2168,7 @@
     initRegistration(); initLogin(); initPasswordRecovery();
     loadState(); prepareMenuSections();
     try { await syncMenuSchedule(); } catch (error) { console.warn('Menu schedule unavailable during startup:', error); }
-    initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms();
+    initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms(); initManagerCapacity();
     menuClockTimer = setInterval(() => { if (currentSession()?.role === 'customer' && screenId().startsWith('menu-')) renderMenuScreens(); }, 30000);
     window.addEventListener('hashchange', handleRoute);
     try {
@@ -1894,8 +2179,9 @@
     } catch { clearSession(); }
     await syncMenuFromBackend();
     if (currentSession()?.role === 'customer') await refreshReservationsWithNotice();
-    if (currentSession()?.role === 'staff') { await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToast(`Staff tables: ${err.message}`)); }
+    if (currentSession()?.role === 'staff') { await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToastError(`Staff tables: ${err.message}`)); }
     if (currentSession()?.role === 'kitchen') await syncKitchenFromBackend();
+    if (currentSession()?.role === 'admin') { await Promise.all([refreshManagerOverview(true), refreshAdminMenu().catch(error => showToastError(`Admin menu: ${error.message}`))]); }
     if (!currentSession() && !PUBLIC_SCREENS.has(screenId())) location.hash = '#login';
     else if (!location.hash || location.hash === '#login') location.hash = roleHome(currentSession().role);
     handleRoute();
@@ -1904,9 +2190,6 @@
 })();
 
 
-// =========================================================
-// EASY BACK NAVIGATION
-// =========================================================
 (function () {
   function fallbackScreenForRole() {
     const email =
@@ -1929,14 +2212,11 @@
 
     event.preventDefault();
 
-    // Hash navigation creates browser-history entries, so normal back works
-    // for the customer's/staff's actual route through the prototype.
     if (window.history.length > 1) {
       window.history.back();
       return;
     }
 
-    // Safe fallback when a screen was opened directly.
     window.location.hash = fallbackScreenForRole();
   });
 })();

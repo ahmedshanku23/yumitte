@@ -1,4 +1,3 @@
-
 const express = require('express');
 const pool = require('../config/db');
 const { requireRole } =
@@ -7,109 +6,97 @@ const { requireRole } =
 const router = express.Router();
 const { queueNotification } = require('../services/emailNotifications');
 
-// CUSTOMER: CREATE RESERVATION
+
 router.post('/', requireRole('customer'), async (req, res) => {
-  const { table_id, reservation_date, reservation_time, guest_count,
-    special_requests } = req.body || {};
-
-  const tableId = Number(table_id);
+  const { reservation_date, reservation_time, guest_count, special_requests } = req.body || {};
   const guests = Number(guest_count);
-
-  if (!Number.isSafeInteger(tableId) || tableId <= 0 ||
-    !Number.isSafeInteger(guests) || guests <= 0 ||
-    typeof reservation_date !== 'string' ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(reservation_date) ||
-    typeof reservation_time !== 'string' ||
-    !/^([01]\d|2[0-3]):[0-5]\d$/.test(reservation_time) ||
-    (special_requests != null &&
-      (typeof special_requests !== 'string' ||
-        special_requests.length > 1000))) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid reservation details'
-    });
+  if (!Number.isSafeInteger(guests) || guests < 1 || guests > 10 ||
+    typeof reservation_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(reservation_date) ||
+    typeof reservation_time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(reservation_time) ||
+    (special_requests != null && (typeof special_requests !== 'string' || special_requests.length > 1000))) {
+    return res.status(400).json({ success: false, message: 'Enter 1–10 guests, a valid date and time.' });
   }
 
-  let connection;
-
+  const [year, month, day] = reservation_date.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() !== month - 1 || parsed.getUTCDate() !== day) {
+    return res.status(400).json({ success: false, message: 'Invalid reservation date.' });
+  }
+  const localParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Indian/Maldives', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  }).formatToParts(new Date());
+  const parts = Object.fromEntries(localParts.filter(x => x.type !== 'literal').map(x => [x.type, x.value]));
+  const nowLocal = `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
+  if (`${reservation_date} ${reservation_time}` < nowLocal) {
+    return res.status(400).json({ success: false, message: 'Choose a future reservation time.' });
+  }
   try {
-    connection = await pool.getConnection();
-    await connection.beginTransaction();
-
-    const [tables] = await connection.execute(
-      `SELECT table_id, capacity
-       FROM restaurant_tables
-       WHERE table_id = ?
-       FOR UPDATE`,
-      [tableId]
+    const [result] = await pool.execute(
+      `INSERT INTO reservations (customer_id, table_id, reservation_date, reservation_time, guest_count, special_requests)
+       VALUES (?, NULL, ?, ?, ?, ?)`,
+      [req.session.user.id, reservation_date, reservation_time, guests, special_requests || null]
     );
-
-    if (!tables.length) {
-      await connection.rollback();
-      return res.status(400).json({
-        success: false,
-        message: 'Table not found'
-      });
-    }
-
-    const [existing] = await connection.execute(
-      `SELECT reservation_id
-       FROM reservations
-       WHERE table_id = ?
-         AND reservation_date = ?
-         AND reservation_time = ?
-         AND status NOT IN ('cancelled', 'completed')
-       LIMIT 1`,
-      [tableId, reservation_date, reservation_time]
-    );
-
-    if (existing.length) {
-      await connection.rollback();
-      return res.status(409).json({
-        success: false,
-        message: 'This table is already reserved for that time'
-      });
-    }
-
-    const [result] = await connection.execute(
-      `INSERT INTO reservations
-       (customer_id, table_id, reservation_date,
-        reservation_time, guest_count, special_requests)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        req.session.user.id,
-        tableId,
-        reservation_date,
-        reservation_time,
-        guests,
-        special_requests || null
-      ]
-    );
-
-    await connection.commit();
-
-    res.status(201).json({
-      success: true,
-      message: 'Reservation submitted for staff approval',
-      reservation_id: result.insertId,
-      status: 'pending'
+    return res.status(201).json({
+      success: true, reservation_id: result.insertId,
+      status: 'pending', message: 'Reservation request submitted. Staff will assign your table.'
     });
-
   } catch (error) {
-    if (connection) await connection.rollback();
-    console.error('Reservation error:', error.message);
-
-    res.status(500).json({
-      success: false,
-      message: 'Unable to create reservation'
-    });
-  } finally {
-    if (connection) connection.release();
+    console.error('Reservation creation error:', error.message);
+    return res.status(500).json({ success: false, message: 'Unable to create reservation.' });
   }
 });
 
-// CUSTOMER: CANCELLATION QUOTE AND CONFIRMED CANCELLATION
-// All amounts are DEMO ledger entries; no external refund/charge is executed.
+const SLOT_MINUTES = 120;
+const MAX_GUESTS = 40;
+const MAX_TABLES = 20;
+const overlapSql = `(
+  (TIMESTAMP(r.reservation_date, r.reservation_time) < DATE_ADD(TIMESTAMP(?, ?), INTERVAL ${SLOT_MINUTES} MINUTE)
+   AND DATE_ADD(TIMESTAMP(r.reservation_date, r.reservation_time), INTERVAL ${SLOT_MINUTES} MINUTE) > TIMESTAMP(?, ?))
+  OR (r.status IN ('checked_in','dining_done') AND
+      TIMESTAMP(?, ?) BETWEEN DATE_ADD(UTC_TIMESTAMP(), INTERVAL 5 HOUR)
+                          AND DATE_ADD(UTC_TIMESTAMP(), INTERVAL 7 HOUR))
+)`;
+
+const validSlot = (date, time) => {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+    typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return false;
+  const [y, m, d] = date.split('-').map(Number);
+  const parsed = new Date(Date.UTC(y, m - 1, d));
+  return parsed.getUTCFullYear() === y && parsed.getUTCMonth() === m - 1 && parsed.getUTCDate() === d;
+};
+const slotArgs = (date, time) => [date, time, date, time, date, time];
+async function getSlotAvailability(db, date, time, excludedReservationId = 0) {
+  const [rows] = await db.execute(`SELECT r.reservation_id, r.table_id, r.guest_count
+    FROM reservations r WHERE r.status IN ('confirmed','checked_in','dining_done')
+      AND r.reservation_id <> ? AND ${overlapSql}`,
+    [excludedReservationId, ...slotArgs(date, time)]);
+  const bookedGuests = rows.reduce((total, row) => total + Number(row.guest_count), 0);
+  const busyTableIds = [...new Set(rows.map(row => Number(row.table_id)).filter(Boolean))];
+  const [tables] = await db.execute('SELECT table_id, table_number, status FROM restaurant_tables ORDER BY table_number');
+  return {
+    capacity: MAX_GUESTS, booked_guests: bookedGuests,
+    remaining_guests: Math.max(0, MAX_GUESTS - bookedGuests),
+    maximum_tables: MAX_TABLES, booked_tables: busyTableIds.length,
+    remaining_tables: Math.max(0, Math.min(MAX_TABLES, tables.length) - busyTableIds.length),
+    tables: tables.map(t => ({
+      table_id: t.table_id, table_number: t.table_number,
+      available: !busyTableIds.includes(Number(t.table_id))
+    }))
+  };
+}
+
+router.get('/availability', requireRole('staff', 'admin'), async (req, res) => {
+  const { date, time } = req.query;
+  if (!validSlot(date, time)) return res.status(400).json({ success: false, message: 'Choose a valid date and time.' });
+  try {
+    return res.json({ success: true, date, time, ...(await getSlotAvailability(pool, date, time)) });
+  } catch (error) {
+    console.error('Staff availability lookup:', error.message);
+    return res.status(500).json({ success: false, message: 'Unable to check availability.' });
+  }
+});
+
 const maleNow = () => {
   const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Indian/Maldives', year: 'numeric', month: '2-digit',
@@ -186,16 +173,13 @@ router.patch('/:id/cancel', requireRole('customer'), async (req, res) => {
     await db.beginTransaction();
     const c = await getCancellationContext(db, id, req.session.user.id, true);
     if (c.error) { await db.rollback(); return res.status(c.error[0]).json({ success: false, message: c.error[1] }); }
-    // A server-side quote is recalculated under lock, not trusted from the browser.
     await db.execute(`UPDATE orders SET status = 'cancelled'
       WHERE reservation_id = ? AND status IN ('awaiting_payment', 'preordered')`, [id]);
-    // Pending deposits were never paid; invalidate them to prevent subsequent confirmation.
     await db.execute(`UPDATE payments SET payment_status = 'failed'
       WHERE reservation_id = ? AND payment_status = 'pending'`, [id]);
     const [updated] = await db.execute(`UPDATE reservations SET status = 'cancelled'
       WHERE reservation_id = ? AND status IN ('pending', 'confirmed')`, [id]);
     if (updated.affectedRows !== 1) throw new Error('Reservation cancellation conflict');
-    // Demo refund ledger. Existing payment rows remain for audit and history.
     await db.execute(`INSERT INTO reservation_cancellations
       (reservation_id, customer_id, cancellation_fee, refund_amount, fee_outstanding, refund_status)
       VALUES (?, ?, ?, ?, ?, 'demo_recorded')`, [id, req.session.user.id,
@@ -218,7 +202,6 @@ router.patch('/:id/cancel', requireRole('customer'), async (req, res) => {
   } finally { if (db) db.release(); }
 });
 
-// CUSTOMER: VIEW OWN RESERVATIONS
 router.get('/my', requireRole('customer'), async (req, res) => {
   try {
     const [rows] = await pool.execute(
@@ -227,7 +210,7 @@ router.get('/my', requireRole('customer'), async (req, res) => {
               r.status, r.special_requests,
               t.table_number
        FROM reservations r
-       JOIN restaurant_tables t ON r.table_id = t.table_id
+       LEFT JOIN restaurant_tables t ON r.table_id = t.table_id
        WHERE r.customer_id = ?
        ORDER BY r.reservation_date DESC,
                 r.reservation_time DESC`,
@@ -248,113 +231,94 @@ router.get('/my', requireRole('customer'), async (req, res) => {
 const { requireAuth } =
   require('../middleware/authMiddleware');
 
-// STAFF / ADMIN: VIEW PENDING RESERVATIONS
-router.get(
-  '/pending',
-  requireRole('staff', 'admin'),
-  async (req, res) => {
-    try {
-      const [rows] = await pool.query(`
-        SELECT
-          r.reservation_id,
-          u.full_name AS customer_name,
-          t.table_number,
-          r.reservation_date,
-          r.reservation_time,
-          r.guest_count,
-          r.special_requests,
-          r.status
-        FROM reservations r
-        JOIN users u ON r.customer_id = u.user_id
-        JOIN restaurant_tables t ON r.table_id = t.table_id
-        WHERE r.status = 'pending'
-        ORDER BY r.reservation_date, r.reservation_time
-      `);
-
-      res.json({ success: true, data: rows });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).json({
-        success: false,
-        message: 'Unable to load pending reservations'
-      });
-    }
+router.get('/pending', requireRole('staff', 'admin'), async (_req, res) => {
+  try {
+    const [rows] = await pool.execute(`
+      SELECT r.reservation_id, u.full_name AS customer_name, t.table_number,
+             r.reservation_date, r.reservation_time, r.guest_count,
+             r.special_requests, r.status
+      FROM reservations r JOIN users u ON u.user_id = r.customer_id
+      LEFT JOIN restaurant_tables t ON t.table_id = r.table_id
+      WHERE r.status = 'pending' ORDER BY r.reservation_date, r.reservation_time`);
+    const [tables] = await pool.execute('SELECT table_id, table_number, status FROM restaurant_tables ORDER BY table_number');
+    const [[occupied]] = await pool.execute(`SELECT COALESCE(SUM(guest_count),0) AS guests
+      FROM reservations WHERE status IN ('checked_in','dining_done')`);
+    res.json({ success: true, data: rows, tables, occupancy: { occupied: Number(occupied.guests), capacity: 40 } });
+  } catch (error) {
+    console.error('Pending reservations:', error.message);
+    res.status(500).json({ success: false, message: 'Unable to load pending reservations' });
   }
-);
+});
 
-// STAFF / ADMIN: ACCEPT RESERVATION
-router.patch(
-  '/:id/accept',
-  requireRole('staff', 'admin'),
-  async (req, res) => {
-    const id = Number(req.params.id);
-
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      return res.status(400).json({
+router.patch('/:id/accept', requireRole('staff', 'admin'), async (req, res) => {
+  const id = Number(req.params.id), tableId = Number(req.body?.table_id);
+  if (!Number.isSafeInteger(id) || id < 1 || !Number.isSafeInteger(tableId) || tableId < 1) {
+    return res.status(400).json({ success: false, message: 'Choose a table to confirm this booking.' });
+  }
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+    const [tables] = await connection.execute('SELECT table_id, table_number, status FROM restaurant_tables ORDER BY table_id FOR UPDATE');
+    const table = tables.find(t => Number(t.table_id) === tableId);
+    if (!table) { await connection.rollback(); return res.status(404).json({ success: false, message: 'Selected table not found.' }); }
+    const [reservations] = await connection.execute(`
+      SELECT reservation_id, guest_count, status,
+             DATE_FORMAT(reservation_date, '%Y-%m-%d') AS date_str,
+             TIME_FORMAT(reservation_time, '%H:%i') AS time_str
+      FROM reservations WHERE reservation_id = ? FOR UPDATE`, [id]);
+    const booking = reservations[0];
+    if (!booking || booking.status !== 'pending') {
+      await connection.rollback(); return res.status(409).json({ success: false, message: 'Reservation is no longer pending.' });
+    }
+    if (Number(booking.guest_count) < 1 || Number(booking.guest_count) > 10) {
+      await connection.rollback(); return res.status(409).json({
         success: false,
-        message: 'Invalid reservation ID'
+        message: 'Each reservation must contain between 1 and 10 guests.'
       });
     }
 
-    const connection = await pool.getConnection();
-
-    try {
-      await connection.beginTransaction();
-
-      const [result] = await connection.execute(
-        `UPDATE reservations
-         SET status = 'confirmed'
-         WHERE reservation_id = ?
-           AND status = 'pending'`,
-        [id]
-      );
-
-      if (result.affectedRows !== 1) {
-        await connection.rollback();
-        return res.status(409).json({
-          success: false,
-          message: 'Reservation is not pending or does not exist'
-        });
+    const availability = await getSlotAvailability(connection, booking.date_str, booking.time_str, id);
+    if (availability.booked_guests + Number(booking.guest_count) > MAX_GUESTS) {
+      await connection.rollback(); return res.status(409).json({
+        success: false,
+        message: `Capacity exceeded: ${availability.booked_guests} of ${MAX_GUESTS} guests already booked at this time.`
+      });
+    }
+    if (availability.booked_tables >= MAX_TABLES) {
+      await connection.rollback(); return res.status(409).json({ success: false, message: 'All 20 tables are assigned for this time.' });
+    }
+    if (!availability.tables.some(t => Number(t.table_id) === tableId && t.available)) {
+      await connection.rollback(); return res.status(409).json({ success: false, message: 'This table is occupied or booked for an overlapping time.' });
+    }
+    if (['occupied', 'awaiting_bill'].includes(String(table.status).toLowerCase())) {
+      const localNow = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Indian/Maldives',
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+      });
+      const values = Object.fromEntries(localNow.formatToParts(new Date()).filter(x => x.type !== 'literal').map(x => [x.type, x.value]));
+      if (booking.date_str === `${values.year}-${values.month}-${values.day}` && booking.time_str <= `${values.hour}:${values.minute}`) {
+        await connection.rollback(); return res.status(409).json({ success: false, message: 'Selected table is currently occupied.' });
       }
-
-      await connection.execute(
-        `INSERT INTO activity_logs
-         (user_id, reservation_id, action,
-          description, old_status, new_status)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          req.session.user.id,
-          id,
-          'reservation_accepted',
-          'Reservation accepted by service staff or manager',
-          'pending',
-          'confirmed'
-        ]
-      );
-
-      await queueNotification(connection, 'reservation_confirmed', id);
-      await connection.commit();
-
-      res.json({
-        success: true,
-        message: 'Reservation confirmed successfully',
-        reservation_id: id,
-        status: 'confirmed'
-      });
-    } catch (error) {
-      await connection.rollback();
-      console.error('Accept reservation error:', error.message);
-      res.status(500).json({
-        success: false,
-        message: 'Unable to accept reservation'
-      });
-    } finally {
-      connection.release();
     }
-  }
-);
-router.get('/pending', requireRole('staff', 'admin'), async (req, res) => {
-  // Existing pending reservation code
+    const [result] = await connection.execute(`UPDATE reservations SET table_id=?, status='confirmed'
+      WHERE reservation_id=? AND status='pending'`, [tableId, id]);
+    if (result.affectedRows !== 1) throw new Error('Reservation confirmation race');
+    await connection.execute(`INSERT INTO activity_logs
+      (user_id, reservation_id, action, description, old_status, new_status)
+      VALUES (?, ?, 'reservation_accepted', ?, 'pending', 'confirmed')`,
+      [req.session.user.id, id, `Staff assigned Table ${table.table_number} and confirmed reservation`]);
+    await queueNotification(connection, 'reservation_confirmed', id);
+    await connection.commit();
+    res.json({
+      success: true, reservation_id: id, status: 'confirmed',
+      table_number: table.table_number, message: 'Reservation confirmed and table assigned.'
+    });
+  } catch (error) {
+    if (connection) await connection.rollback().catch(() => { });
+    console.error('Accept reservation error:', error.message);
+    res.status(500).json({ success: false, message: 'Unable to confirm reservation.' });
+  } finally { if (connection) connection.release(); }
 });
 
 router.patch(
@@ -416,8 +380,7 @@ router.patch(
         });
       }
 
-      // Check-in opens 15 minutes before the reservation, using Maldives
-      // wall-clock time regardless of the OS or database server time zone.
+
       const clockParts = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Indian/Maldives', year: 'numeric', month: '2-digit',
         day: '2-digit', hour: '2-digit', minute: '2-digit',
@@ -457,7 +420,7 @@ router.patch(
         });
       }
 
-      // Prevent simultaneous occupancy of the same table.
+
       const [tableRows] = await connection.execute(
         `SELECT status FROM restaurant_tables
          WHERE table_id = ?
@@ -488,7 +451,7 @@ router.patch(
         [reservation.table_id]
       );
 
-      // Release scheduled pre-orders to the kitchen.
+
       const [preorders] = await connection.execute(
         `UPDATE orders
          SET status = 'received'
@@ -561,7 +524,7 @@ router.patch(
       await connection.beginTransaction();
       transactionStarted = true;
 
-      // Lock reservation and verify ownership.
+
       const [reservations] = await connection.execute(
         `SELECT reservation_id, customer_id, status
          FROM reservations
@@ -602,8 +565,7 @@ router.patch(
         });
       }
 
-      // Lock related orders to prevent status changes
-      // during the dining completion transaction.
+
       const [orders] = await connection.execute(
         `SELECT order_id, status
          FROM orders
@@ -715,7 +677,7 @@ router.patch(
       await connection.beginTransaction();
       started = true;
 
-      // Lock reservation before any billing or table changes.
+
       const [rows] = await connection.execute(
         `SELECT reservation_id, table_id, status
          FROM reservations
@@ -744,7 +706,7 @@ router.patch(
         });
       }
 
-      // Confirm that every non-cancelled order was served.
+
       const [orderCheck] = await connection.execute(
         `SELECT
            COUNT(*) AS total_orders,
@@ -767,7 +729,7 @@ router.patch(
         });
       }
 
-      // Calculate order total, excluding cancelled orders.
+
       const [orderTotals] = await connection.execute(
         `SELECT COALESCE(SUM(total_amount), 0) AS total
          FROM orders
@@ -776,7 +738,7 @@ router.patch(
         [reservationId]
       );
 
-      // Only completed payments count toward settlement.
+
       const [paymentTotals] = await connection.execute(
         `SELECT COALESCE(SUM(amount), 0) AS total
          FROM payments
@@ -807,7 +769,7 @@ router.patch(
         });
       }
 
-      // Serialize table-state changes.
+
       const [tables] = await connection.execute(
         `SELECT table_id, status
          FROM restaurant_tables

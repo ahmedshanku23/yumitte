@@ -2570,7 +2570,7 @@
                                 <section class="grid-4" style="margin-top:20px">
                                         <div class="metric">
                                                 <span>
-                                                        Today's reservations
+                                                        Pending reservations
                                                 </span>
                                                 <b>
                                                         0
@@ -2626,6 +2626,36 @@
                                                                 availability</small><span
                                                                 class="manager-shortcut-arrow">↗</span></a></div>
                                 </section>
+                                <section class="section" id="manager-capacity-panel"
+                                        aria-labelledby="manager-capacity-heading">
+                                        <div class="section-head">
+                                                <div>
+                                                        <h2 id="manager-capacity-heading">Restaurant Capacity &amp;
+                                                                Table Allocation</h2>
+                                                        <p class="muted">Live MySQL availability · 40 guests · 20
+                                                                flexible tables · estimated 2-hour booking window</p>
+                                                </div>
+                                                <button type="button" class="btn btn-secondary"
+                                                        id="manager-refresh-capacity">Refresh</button>
+                                        </div>
+                                        <div class="form-grid">
+                                                <div class="field"><label for="manager-slot-date">Reservation
+                                                                date</label><input type="date" id="manager-slot-date">
+                                                </div>
+                                                <div class="field"><label for="manager-slot-time">Reservation
+                                                                time</label><input type="time" id="manager-slot-time"
+                                                                value="19:00"></div>
+                                        </div>
+                                        <div class="actions"><button class="btn btn-dark" type="button"
+                                                        id="manager-check-slot">Check Availability</button></div>
+                                        <div id="manager-capacity-results" aria-live="polite" style="margin-top:16px">
+                                                <p class="muted">Select a date and time to check live capacity.</p>
+                                        </div>
+                                        <h3 style="margin-top:24px">Pending reservation requests</h3>
+                                        <div id="manager-pending-requests" aria-live="polite">
+                                                <p class="muted">Loading pending reservations…</p>
+                                        </div>
+                                </section>
                                 <section class="section">
                                         <div class="section-head">
                                                 <h2>
@@ -2644,7 +2674,7 @@
                                                                 10
                                                         </b>
                                                         <small>
-                                                                10 available · 0 occupied · 0 reserved
+                                                                Live table status loading…
                                                         </small>
                                                 </div>
                                                 <div class="metric">
@@ -3762,18 +3792,12 @@
                                                                 Category
                                                         </label>
                                                         <select id="add-item-category" name="add-item-category">
-                                                                <option>
-                                                                        Breakfast
-                                                                </option>
-                                                                <option>
-                                                                        Startar
-                                                                </option>
-                                                                <option>
-                                                                        Main Course
-                                                                </option>
-                                                                <option>
-                                                                        Desserts
-                                                                </option>
+                                                                <option>Breakfast</option>
+                                                                <option>Lunch</option>
+                                                                <option>Supper</option>
+                                                                <option>Dinner</option>
+                                                                <option>Drinks</option>
+                                                                <option>Desserts</option>
                                                         </select>
                                                 </div>
                                                 <div class="field">
@@ -3868,18 +3892,12 @@
                                                                 Category
                                                         </label>
                                                         <select id="edit-item-category" name="edit-item-category">
-                                                                <option>
-                                                                        Breakfast
-                                                                </option>
-                                                                <option>
-                                                                        Startar
-                                                                </option>
-                                                                <option>
-                                                                        Main Course
-                                                                </option>
-                                                                <option>
-                                                                        Desserts
-                                                                </option>
+                                                                <option>Breakfast</option>
+                                                                <option>Lunch</option>
+                                                                <option>Supper</option>
+                                                                <option>Dinner</option>
+                                                                <option>Drinks</option>
+                                                                <option>Desserts</option>
                                                         </select>
                                                 </div>
                                                 <div class="field">
@@ -5444,7 +5462,7 @@
                                                         <label for="reservation-guests">
                                                                 Guests
                                                         </label>
-                                                        <input id="reservation-guests" inputmode="numeric" max="20"
+                                                        <input id="reservation-guests" inputmode="numeric" max="40"
                                                                 min="1" name="reservation-guests"
                                                                 placeholder="Enter number of guests" required=""
                                                                 step="1" type="number" />
@@ -5484,17 +5502,7 @@
                                                                 </div>
                                                         </div>
                                                 </div>
-                                                <div class="field full reservation-table-field">
-                                                        <label for="reservation-table">Choose a table</label>
-                                                        <select disabled="" id="reservation-table"
-                                                                name="reservation-table">
-                                                                <option selected="" value="">Choose date, guests and
-                                                                        time first</option>
-                                                        </select>
-                                                        <div class="meta reservation-table-help">Available tables will
-                                                                appear after you choose the date, number of guests and
-                                                                preferred time.</div>
-                                                </div>
+
                                                 <div class="field full">
                                                         <label>
                                                                 Special request (optional)
@@ -5503,9 +5511,13 @@
                                                                 placeholder="Add a note" rows="3"></textarea>
                                                 </div>
                                         </div>
-                                        <div class="notice reservation-qr-note">
-                                                <b>No QR code is needed to reserve.</b>
-                                                <span>Use the table code only after you arrive.</span>
+                                        <div class="notice yumio-cancellation-notice" role="note">
+                                                <div><strong>Reservation cancellation policy</strong>
+                                                        <p>Cancel at least 1 hour before your booked time for a full
+                                                                eligible refund. If you cancel less than 1 hour before
+                                                                your booking, a MVR 25 cancellation fee applies and is
+                                                                deducted from any eligible refund.</p>
+                                                </div>
                                         </div>
                                         <div class="actions">
                                                 <a class="btn btn-primary" href="#reservation-details"
@@ -6064,146 +6076,7 @@
                                 </div>
                                 <section class="section">
                                         <div class="table-grid">
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 01
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                2 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 02
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                2 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 03
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                4 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 04
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                4 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 05
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                4 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 06
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                6 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 07
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                2 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 08
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                4 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 09
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                6 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
-                                                <div class="table-card">
-                                                        <strong>
-                                                                Table 10
-                                                        </strong>
-                                                        <div class="status" style="margin:8px 0">
-                                                                Available
-                                                        </div>
-                                                        <div class="meta">
-                                                                4 seats
-                                                        </div>
-                                                        <a class="linkbtn" href="#scan-table">
-                                                                View QR
-                                                        </a>
-                                                </div>
+                                                <div class="empty">Loading tables from MySQL…</div>
                                         </div>
                                 </section>
                         </main>
