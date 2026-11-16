@@ -458,7 +458,7 @@
         if (!user || !user.role) throw new Error('Login response is missing user role. Check authRoutes.js response format.');
         setSession({ id: user.id ?? user.user_id, email: user.email || mail, role: user.role, name: user.name || user.full_name || mail });
         form.reset(); password.type = 'password'; if (toggle) toggle.textContent = 'SHOW';
-        if (user.role === 'customer') await refreshReservationsWithNotice();
+        if (user.role === 'customer') { await refreshReservationsWithNotice(); await refreshCustomerOrderStatuses(); }
         if (user.role === 'staff') { await refreshServiceRequests(); await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToastError(`Staff tables: ${err.message}`)); }
         if (user.role === 'kitchen') await syncKitchenFromBackend();
         if (user.role === 'admin') await refreshManagerOverview(true);
@@ -923,8 +923,20 @@
       return;
     }
 
-    e.innerHTML = `<strong>Checked in to Table ${esc(t.id)}</strong><br>You can place dine-in orders and send service requests. When you finish dining, mark the session as done.`;
-    actions.innerHTML = '<a class="btn btn-secondary" href="#menu-breakfast">Browse Menu</a><button class="btn btn-dark dynamic-btn" data-action="customer-dining-done">Mark Dining Done</button>';
+    const activeReservation = s.reservations.find(r => r.status === 'Checked In' && r.tableId === t.id && r.customerEmail === currentSession()?.email);
+    const matchingOrders = newestFirst(s.orders.filter(o =>
+      o.customerEmail === currentSession()?.email &&
+      o.status !== 'Cancelled' &&
+      activeReservation && String(o.reservationId) === String(activeReservation.id)
+    ));
+    const latestOrder = matchingOrders[0];
+    const statusSummary = latestOrder
+      ? `<br><span class="meta">Latest order #${esc(latestOrder.id)}: <strong>${esc(latestOrder.status)}</strong></span>`
+      : '<br><span class="meta">No order has been placed for this reservation yet.</span>';
+    e.innerHTML = `<strong>Checked in to Table ${esc(t.id)}</strong><br>You can place dine-in orders and send service requests. When you finish dining, mark the session as done.${statusSummary}`;
+    actions.innerHTML = '<a class="btn btn-secondary" href="#menu-breakfast">Browse Menu</a>' +
+      (latestOrder ? '<a class="btn btn-secondary" href="#orders">View Order Status</a>' : '') +
+      '<button class="btn btn-dark dynamic-btn" data-action="customer-dining-done">Mark Dining Done</button>';
   }
 
   const MENU_SCREENS = { 'menu-breakfast': 'Breakfast', 'menu-lunch': 'Lunch', 'menu-supper': 'Supper', 'menu-dinner': 'Dinner', 'menu-drinks': 'Drinks', 'menu-desserts': 'Desserts' };
@@ -1341,6 +1353,72 @@
     finally { preorderInProgress = false; if (button) button.disabled = false; }
   }
   function renderOrderConfirmation() { const s = loadState(), o = s.orders.find(x => x.id === s.selectedOrderId) || s.orders.at(-1), e = document.querySelector('#order-confirmation .empty'); if (e) e.innerHTML = o ? `<strong>${esc(o.id)} placed successfully.</strong><br>${o.reservationId ? `Reservation ${esc(o.reservationId)} · ` : ''}Table ${esc(o.tableId)} · ${money(o.total)}<br>Status: <strong>${esc(o.status)}</strong>${o.preorder ? '<br>40% demo deposit confirmed. Kitchen receives the order after check-in.' : ''}` : 'No order has been submitted yet.'; }
+  let customerOrdersSyncInProgress = false;
+  async function syncCustomerOrderStatuses() {
+    if (currentSession()?.role !== 'customer' || customerOrdersSyncInProgress) return;
+    customerOrdersSyncInProgress = true;
+    const accountEmail = currentSession().email;
+    try {
+      const result = await apiRequest('/orders/my');
+      if (!Array.isArray(result.data)) throw new Error('Unexpected customer orders response');
+      if (currentSession()?.role !== 'customer' || currentSession()?.email !== accountEmail) return;
+      const state = loadState();
+      const labels = {
+        preordered: 'Preordered', received: 'Received', accepted: 'Accepted',
+        preparing: 'Preparing', ready: 'Ready', served: 'Served',
+        awaiting_payment: 'Awaiting Payment', cancelled: 'Cancelled'
+      };
+      const reservationMap = new Map(state.reservations.filter(r => r.customerEmail === accountEmail).map(r => [String(r.id), r]));
+      const original = new Map(state.orders.filter(o => o.fromBackend && o.customerEmail === accountEmail).map(o => [String(o.id), o]));
+      const updated = [];
+      for (const row of result.data) {
+        if (row.order_id == null) continue;
+        const id = String(row.order_id);
+        const reservationId = row.reservation_id == null ? '' : String(row.reservation_id);
+        const old = original.get(id);
+        const reservation = reservationMap.get(reservationId);
+        const status = labels[String(row.status || '').toLowerCase()] || String(row.status || old?.status || 'Received');
+        const apiItems = Array.isArray(row.items) ? row.items : null;
+        const items = apiItems ? apiItems.map(item => ({
+          id: String(item.item_id ?? item.id ?? ''),
+          name: String(item.item_name ?? item.name ?? state.menu.find(m => m.id === `item-${item.item_id}`)?.name ?? 'Menu item'),
+          quantity: Number(item.quantity || 0),
+          price: Number(item.unit_price ?? item.price ?? 0),
+          notes: String(item.notes ?? '')
+        })) : (old?.items || []);
+        updated.push({
+          ...(old || {}),
+          id,
+          fromBackend: true,
+          customerEmail: accountEmail,
+          customerName: currentSession()?.name || old?.customerName || 'Customer',
+          reservationId,
+          tableId: reservation?.tableId || old?.tableId || '',
+          preorder: String(row.order_type || '').toLowerCase() === 'preorder',
+          items,
+          itemDetailsAvailable: !!apiItems || !!old?.items?.length,
+          total: Number(row.total_amount ?? old?.total ?? 0),
+          status,
+          createdAt: row.created_at || old?.createdAt || '',
+          servedAt: row.served_at || old?.servedAt || null
+        });
+      }
+      state.orders = state.orders.filter(o => o.customerEmail !== accountEmail || !o.fromBackend).concat(updated);
+      if (state.selectedOrderId && !state.orders.some(o => o.id === state.selectedOrderId && o.customerEmail === accountEmail)) state.selectedOrderId = null;
+      saveState(state);
+      renderOrderConfirmation();
+      renderOrders();
+      renderOrderTracking();
+      renderTableConnected();
+      renderCustomerHistory();
+    } finally {
+      customerOrdersSyncInProgress = false;
+    }
+  }
+  async function refreshCustomerOrderStatuses() {
+    try { await syncCustomerOrderStatuses(); }
+    catch (error) { showToastError(`Order status refresh failed: ${error.message}`); }
+  }
   function renderOrders() {
     const s = loadState(), target = document.querySelector('#orders section.section');
     if (!target) return;
@@ -1997,10 +2075,10 @@
                       <span class="status">${esc(o.status)}</span>
                     </div>
                     <div class="history-order-items">
-                      ${o.items.map(item => `<div class="dynamic-row">
+                      ${o.items.length ? o.items.map(item => `<div class="dynamic-row">
                         <span>${item.quantity} × ${esc(item.name)}</span>
                         <strong>${money(item.price * item.quantity)}</strong>
-                      </div>`).join('')}
+                      </div>`).join('') : '<div class="meta">Item details were not provided by the order history API.</div>'}
                     </div>
                     <div class="total-row grand"><span>Order total</span><span>${money(o.total)}</span></div>
                   </div>`).join('')
@@ -2027,10 +2105,10 @@
                   <span class="status">${esc(o.status)}</span>
                 </div>
                 <div class="history-order-items">
-                  ${o.items.map(item => `<div class="dynamic-row">
+                  ${o.items.length ? o.items.map(item => `<div class="dynamic-row">
                     <span>${item.quantity} × ${esc(item.name)}</span>
                     <strong>${money(item.price * item.quantity)}</strong>
-                  </div>`).join('')}
+                  </div>`).join('') : '<div class="meta">Item details were not provided by the order history API.</div>'}
                 </div>
                 <div class="total-row grand"><span>Order total</span><span>${money(o.total)}</span></div>
               </div>`).join('')}
@@ -2156,6 +2234,7 @@
     if (currentSession()?.role === 'staff' && ['staff-dashboard', 'staff-tables'].includes(screenId())) syncStaffTables().catch(err => showToastError(`Staff tables: ${err.message}`));
     if (currentSession()?.role === 'staff' && ['staff-dashboard', 'staff-requests'].includes(screenId())) refreshServiceRequests().catch(err => showToastError(`Service requests: ${err.message}`));
     if (currentSession()?.role === 'customer' && ['bill', 'payment'].includes(screenId())) refreshFinalBill().catch(err => showToastError(`Billing: ${err.message}`));
+    if (currentSession()?.role === 'customer' && ['orders', 'order-tracking', 'customer-history', 'table-connected'].includes(screenId())) refreshCustomerOrderStatuses();
     if (currentSession()?.role === 'staff' && screenId() === 'staff-reservations') {
       refreshStaffPendingWithNotice();
     }
@@ -2170,6 +2249,7 @@
     try { await syncMenuSchedule(); } catch (error) { console.warn('Menu schedule unavailable during startup:', error); }
     initReservation(); initTables(); initCart(); setupAccessibilityNavigation(); initFloatingCart(); initServiceRequests(); initManagerForms(); initManagerCapacity();
     menuClockTimer = setInterval(() => { if (currentSession()?.role === 'customer' && screenId().startsWith('menu-')) renderMenuScreens(); }, 30000);
+    setInterval(() => { if (currentSession()?.role === 'customer' && ['orders', 'order-tracking', 'table-connected'].includes(screenId())) syncCustomerOrderStatuses().catch(() => { }); }, 10000);
     window.addEventListener('hashchange', handleRoute);
     try {
       const result = await apiRequest('/auth/me');
@@ -2179,6 +2259,7 @@
     } catch { clearSession(); }
     await syncMenuFromBackend();
     if (currentSession()?.role === 'customer') await refreshReservationsWithNotice();
+    if (currentSession()?.role === 'customer') await refreshCustomerOrderStatuses();
     if (currentSession()?.role === 'staff') { await refreshStaffPendingWithNotice(); await syncStaffTables().catch(err => showToastError(`Staff tables: ${err.message}`)); }
     if (currentSession()?.role === 'kitchen') await syncKitchenFromBackend();
     if (currentSession()?.role === 'admin') { await Promise.all([refreshManagerOverview(true), refreshAdminMenu().catch(error => showToastError(`Admin menu: ${error.message}`))]); }

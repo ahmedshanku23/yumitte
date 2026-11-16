@@ -24,18 +24,47 @@ router.get('/my', requireRole('customer'), async (req, res) => {
        JOIN reservations r
          ON o.reservation_id = r.reservation_id
        WHERE r.customer_id = ?
-       ORDER BY o.created_at DESC`,
+       ORDER BY o.created_at DESC, o.order_id DESC`,
       [req.session.user.id]
     );
+
+    if (orders.length === 0) {
+      return res.json({ success: true, count: 0, data: [] });
+    }
+
+    const orderIds = orders.map(order => order.order_id);
+    const placeholders = orderIds.map(() => '?').join(',');
+    const [items] = await pool.query(
+      `SELECT oi.order_id, oi.order_item_id, oi.item_id,
+              m.item_name, oi.quantity, oi.unit_price
+       FROM order_items oi
+       JOIN menu_items m ON m.item_id = oi.item_id
+       WHERE oi.order_id IN (${placeholders})
+       ORDER BY oi.order_id, oi.order_item_id`,
+      orderIds
+    );
+
+    const itemsByOrder = new Map(orderIds.map(id => [String(id), []]));
+    for (const item of items) {
+      const group = itemsByOrder.get(String(item.order_id));
+      if (group) group.push({
+        item_id: item.item_id,
+        item_name: item.item_name,
+        quantity: item.quantity,
+        unit_price: item.unit_price
+      });
+    }
 
     res.json({
       success: true,
       count: orders.length,
-      data: orders
+      data: orders.map(order => ({
+        ...order,
+        items: itemsByOrder.get(String(order.order_id)) || []
+      }))
     });
   } catch (error) {
     console.error('Order history error:', error.message);
-
     res.status(500).json({
       success: false,
       message: 'Unable to retrieve orders'
